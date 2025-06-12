@@ -10,9 +10,7 @@ export default function AuthDialog({ open, onClose }) {
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "success" });
-    }, 3000);
+    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
   };
 
   const [form, setForm] = useState({
@@ -20,7 +18,7 @@ export default function AuthDialog({ open, onClose }) {
     email: "",
     password: "",
     URL: "",
-    isShop: false, // Default is Customer
+    isShop: false,
   });
 
   const handleChange = (e) => {
@@ -43,7 +41,7 @@ export default function AuthDialog({ open, onClose }) {
         showToast(data.message, "success");
 
         if (isSignup) {
-          // Reset and switch to login
+          // After signup, reset form and switch to login
           setIsSignup(false);
           setForm({
             name: "",
@@ -53,10 +51,19 @@ export default function AuthDialog({ open, onClose }) {
             isShop: false,
           });
         } else {
-          // Close dialog after short delay
-          setTimeout(() => {
-            onClose();
-          }, 1000);
+          // ✅ Save user token & info in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify({
+            name: data.user.name,
+            email: data.user.email,
+            isShop: data.user.isShop,
+            profilePIC: data.user.profilePIC,
+            URL: data.user.URL,
+            verified: data.user.verified,
+          }));
+
+          // Close after success
+          setTimeout(() => onClose(), 1000);
         }
       } else {
         showToast(data.message, "error");
@@ -140,6 +147,7 @@ export default function AuthDialog({ open, onClose }) {
               className="border p-2 rounded text-black placeholder-gray-500"
               value={form.email}
               onChange={handleChange}
+              required
             />
 
             <div className="relative">
@@ -150,6 +158,7 @@ export default function AuthDialog({ open, onClose }) {
                 className="border p-2 rounded w-full text-black placeholder-gray-500 pr-10"
                 value={form.password}
                 onChange={handleChange}
+                required
               />
               <div
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"

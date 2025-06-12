@@ -1,7 +1,9 @@
+// index.js
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const productsRoutes = require('./routes/products');
+const storesRouter = require("./routes/stores");
 const { connectMongo } = require('./db');
 
 const app = express();
@@ -9,6 +11,9 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use("/stores", storesRouter);
+const wishlistRoutes = require("./routes/wishlist");
+app.use("/wishlist", wishlistRoutes);
 
 app.use('/', authRoutes);
 app.use('/products', productsRoutes);

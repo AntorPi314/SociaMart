@@ -17,4 +17,12 @@ function getDb() {
   return client.db("martDB");  // your DB name here
 }
 
-module.exports = { client, connectMongo, getDb };
+function getUserDb() {
+  return client.db("userDB");
+}
+
+function getProductDb() {
+  return client.db("productDB");
+}
+
+module.exports = { client, connectMongo, getDb, getUserDb, getProductDb };

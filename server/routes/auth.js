@@ -7,22 +7,18 @@ const { client } = require('../db');
 const db = client.db("userDB");
 const usersCollection = db.collection("users");
 
-// ✅ GET /signup → Test route
 router.get('/signup', (req, res) => {
   res.send('✅ Signup GET route is working!');
 });
 
-// ✅ GET /login → Test route
 router.get('/login', (req, res) => {
   res.send('✅ Login GET route is working!');
 });
 
-// ✅ POST /signup → Secure user registration
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password, isShop, URL } = req.body;
 
-    // Basic field validation
     if (!name || !email || !password) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
@@ -44,7 +40,6 @@ router.post('/signup', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const profilePIC = isShop ? "/assets/shop.svg" : "/assets/customer.svg";
 
     const newUser = {
@@ -53,6 +48,8 @@ router.post('/signup', async (req, res) => {
       password: hashedPassword,
       isShop: !!isShop,
       profilePIC,
+      verified: false,
+      followers: 0,
       ...(isShop && { URL }),
     };
 
@@ -65,9 +62,6 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
-
-// ✅ POST /login → Secure user login with JWT
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -96,7 +90,13 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful',
       token,
-      user: { name: user.name, email: user.email, isShop: user.isShop },
+      user: {
+        name: user.name,
+        email: user.email,
+        isShop: user.isShop,
+        followers: user.followers || 0,
+        verified: user.verified || false,
+      },
     });
   } catch (error) {
     console.error('Login Error:', error);
