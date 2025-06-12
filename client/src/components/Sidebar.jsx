@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User, ShoppingBag, LogOut } from "lucide-react";
 import Vector from "../assets/bx_store.svg";
+import AuthDialog from "./AuthDialog";
 
 export default function Root() {
   return (
@@ -8,9 +9,10 @@ export default function Root() {
       <div>
         <BarButton1 />
         <BarButton1 />
+        <BarButton1 />
       </div>
       <div>
-        <FloatingMenuButton />
+        <FloatingMenuAccountButton />
       </div>
     </div>
   );
@@ -27,23 +29,26 @@ function BarButton1() {
   );
 }
 
-function FloatingMenuButton() {
-  const [open, setOpen] = useState(false);
+function FloatingMenuAccountButton() {
+  const [openMenu, setOpenMenu] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpenMenu(!openMenu)}
         className="w-[100%] h-12 flex items-center justify-center bg-[#19376d]"
       >
         <User className="text-white" />
       </button>
-      {open && (
+      {openMenu && (
         <div className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10">
-          <MenuItem icon={<User size={18} />} label="Profile" />
-          <MenuItem icon={<ShoppingBag size={18} />} label="My Orders" />
-          <MenuItem icon={<LogOut size={18} />} label="Logout" />
+          <div onClick={() => setShowAuth(true)}>
+            <MenuItem icon={<User size={18} />} label="Login / Signup" />
+          </div>
         </div>
       )}
+      <AuthDialog open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }
