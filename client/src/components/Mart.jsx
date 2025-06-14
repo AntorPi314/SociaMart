@@ -196,7 +196,7 @@ function TopHeader2({ searchTerm, setSearchTerm, sortOption, setSortOption }) {
 
   return (
     <div className="flex items-center gap-4 pr-4 bg-white relative">
-      <div className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 w-60 sm:w-72 md:w-80 lg:w-96 bg-white shadow-sm">
+      <div className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 w-40 sm:w-52 md:w-60 lg:w-76 bg-white shadow-sm">
         <Search className="w-5 h-5 text-[#C9A9A6]" />
         <input
           type="text"
