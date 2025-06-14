@@ -6,7 +6,7 @@ const { getUserDb, getProductDb } = require("../db");
 const jwt = require("jsonwebtoken");
 const { ObjectId } = require("mongodb");
 
-router.get("/:storeURL", async (req, res) => {
+router.get("/products/:storeURL", async (req, res) => {
   try {
     const storeURL = req.params.storeURL;
     const userDB = getUserDb();

@@ -19,8 +19,8 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// ✅ POST /wishlist/add
-router.post("/wishlist/add", authenticateToken, async (req, res) => {
+// ✅ POST /cart/add
+router.post("/cart/add", authenticateToken, async (req, res) => {
   const userId = req.user.userId || req.user._id;
   const { productId, storeId } = req.body;
 
@@ -36,20 +36,20 @@ router.post("/wishlist/add", authenticateToken, async (req, res) => {
       { _id: new ObjectId(userId) },
       {
         $addToSet: {
-          [`wishlists.${storeId}`]: productId, // ✅ keep as string
+          [`cart.${storeId}`]: productId, 
         },
       }
     );
 
-    res.json({ success: true, message: "Added to wishlist" });
+    res.json({ success: true, message: "Added to cart" });
   } catch (err) {
-    console.error("Add to wishlist error:", err);
+    console.error("Add to cart error:", err);
     res.status(500).json({ success: false, message: "Add failed" });
   }
 });
 
-// ✅ DELETE /wishlist/remove/:storeId/:productId
-router.delete("/wishlist/remove/:storeId/:productId", authenticateToken, async (req, res) => {
+// ✅ DELETE /cart/remove/:storeId/:productId
+router.delete("/cart/remove/:storeId/:productId", authenticateToken, async (req, res) => {
   const userId = req.user.userId || req.user._id;
   const { storeId, productId } = req.params;
 
@@ -65,14 +65,14 @@ router.delete("/wishlist/remove/:storeId/:productId", authenticateToken, async (
       { _id: new ObjectId(userId) },
       {
         $pull: {
-          [`wishlists.${storeId}`]: productId, // ✅ keep as string
+          [`cart.${storeId}`]: productId, 
         },
       }
     );
 
-    res.json({ success: true, message: "Removed from wishlist" });
+    res.json({ success: true, message: "Removed from cart" });
   } catch (err) {
-    console.error("Remove from wishlist error:", err);
+    console.error("Remove from cart error:", err);
     res.status(500).json({ success: false, message: "Remove failed" });
   }
 });

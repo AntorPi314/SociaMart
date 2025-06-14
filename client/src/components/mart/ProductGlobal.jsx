@@ -1,7 +1,8 @@
-// src/components/mart/ProductGlobal.jsx
 import React, { useEffect, useState } from "react";
 import { ShoppingCart, Star, Heart as HeartOutline } from "lucide-react";
 import axios from "axios";
+import Toast from "../Toast";
+import ProductDialog from "./ProductDialog"; // Make sure this path is correct
 
 const ProductGlobal = ({
   id,
@@ -15,10 +16,12 @@ const ProductGlobal = ({
   hideShop,
   wishlist,
   storeId,
-  productId
+  productId,
 }) => {
   const [isLiked, setIsLiked] = useState(wishlist || false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -38,7 +41,6 @@ const ProductGlobal = ({
     try {
       let res;
       if (isLiked) {
-        // DELETE does not accept data payload as second argument, config only
         res = await axios.delete(endpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,7 +57,6 @@ const ProductGlobal = ({
 
       if (res.data.success) {
         setIsLiked(!isLiked);
-        console.log("✅ Wishlist updated");
       } else {
         console.warn("⚠️ Wishlist response failed", res.data);
       }
@@ -64,8 +65,36 @@ const ProductGlobal = ({
     }
   };
 
-  const handleBuyNow = () => {
-    console.log("Buy Now clicked for:", name);
+  const handleBuyNow = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Please login to add to cart");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/cart/add",
+        { productId, storeId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.data.success) {
+        setToast({ message: "✅ Added to cart", type: "success" });
+      } else {
+        setToast({
+          message: res.data.message || "⚠️ Already in cart",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      setToast({
+        message: err?.response?.data?.message || "❌ Failed to add to cart",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -78,20 +107,22 @@ const ProductGlobal = ({
             className="w-4 h-4"
           />
           <span className="font-medium">Best Buy Store</span>
-          <span className="text-blue-500 font-semibold">• Follow</span>
+          <span className="text-blue-500 font-semibold cursor-pointer">• Follow</span>
         </div>
       )}
 
-      {/* Product Image */}
-      <div className="relative">
+      {/* Product Image (clickable) */}
+      <div className="relative cursor-pointer" onClick={() => setShowDialog(true)}>
         <img
           src={images?.[0] || "https://via.placeholder.com/300x200?text=Product"}
           alt={name}
           className="w-full h-36 object-cover rounded-md"
         />
-        <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-md">
-          Only {left} Left
-        </span>
+        {left < 10 && (
+          <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-md">
+            Only {left} Left
+          </span>
+        )}
         <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1">
           {rating} <Star className="w-3 h-3 fill-white" />
         </span>
@@ -143,6 +174,30 @@ const ProductGlobal = ({
           </button>
         </div>
       </div>
+
+      {/* Toast message */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Product Dialog */}
+      {showDialog && (
+        <ProductDialog
+          onClose={() => setShowDialog(false)}
+          id={id}
+          name={name}
+          price={price}
+          priceOld={priceOld}
+          rating={rating}
+          left={left}
+          images={images}
+          description={description}
+        />
+      )}
     </div>
   );
 };

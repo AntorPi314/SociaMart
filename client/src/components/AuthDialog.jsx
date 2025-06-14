@@ -1,3 +1,5 @@
+// src/components/AuthDialog.jsx
+
 import { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
