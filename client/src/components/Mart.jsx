@@ -126,7 +126,7 @@ export default function Mart({ storeName }) {
 
       <div className="flex-1 overflow-y-auto p-1 bg-[#EDF0F9] rounded-2xl border-8 border-[#EDF0F9]">
         {storeInfo === null ? null : filtered.length > 0 ? (
-          <MartBody filtered={filtered} />
+          <MartBody filtered={filtered} storeId={storeInfo?._id} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500 font-semibold text-lg">
             No products found in this store.
@@ -238,7 +238,7 @@ function TopHeader2({ searchTerm, setSearchTerm, sortOption, setSortOption }) {
   );
 }
 
-function MartBody({ filtered }) {
+function MartBody({ filtered, storeId }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
       {filtered.map((product) => (
@@ -253,6 +253,9 @@ function MartBody({ filtered }) {
           images={product.images}
           description={product.des}
           hideShop={true}
+          wishlist={product.wishlist}
+          storeId={storeId}
+          productId={product._id}
         />
       ))}
     </div>

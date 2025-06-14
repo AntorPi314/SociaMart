@@ -1,63 +1,80 @@
+// routes/wishlist.js
+
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const { getUserDb } = require("../db");
+const { ObjectId } = require("mongodb");
 
-// Middleware to authenticate JWT (same as before)
+// Middleware to authenticate JWT
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
+  if (!token) return res.status(401).json({ success: false, message: "No token provided" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ success: false, message: "Invalid token" });
+    req.user = decoded; // decoded should contain userId (or _id)
     next();
   });
 };
 
-// POST /wishlist/add - Add product to wishlist
+// ✅ POST /wishlist/add
 router.post("/add", authenticateToken, async (req, res) => {
-  const userEmail = req.user.email;
-  const { productId } = req.body;
+  const userId = req.user.userId || req.user._id;
+  const { productId, storeId } = req.body;
 
-  if (!productId) return res.status(400).json({ message: "productId is required" });
+  if (!productId || !storeId) {
+    return res.status(400).json({ success: false, message: "productId and storeId required" });
+  }
 
   try {
-    const user = await User.findOne({ email: userEmail });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const userDB = getUserDb();
+    const usersCollection = userDB.collection("users");
 
-    if (!user.wishlist.includes(productId)) {
-      user.wishlist.push(productId);
-      await user.save();
-    }
+    await usersCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $addToSet: {
+          [`wishlists.${storeId}`]: productId, // ✅ keep as string
+        },
+      }
+    );
 
-    res.status(200).json({ message: "Product added to wishlist" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.json({ success: true, message: "Added to wishlist" });
+  } catch (err) {
+    console.error("Add to wishlist error:", err);
+    res.status(500).json({ success: false, message: "Add failed" });
   }
 });
 
-// GET /wishlist/check/:productId - Check if product is in wishlist
-router.get("/check/:productId", authenticateToken, async (req, res) => {
-    try {
-      const { productId } = req.params;
-      const userEmail = req.user.email;
-  
-      // Find the user in DB by email
-      const user = await User.findOne({ email: userEmail });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+// ✅ DELETE /wishlist/remove/:storeId/:productId
+router.delete("/remove/:storeId/:productId", authenticateToken, async (req, res) => {
+  const userId = req.user.userId || req.user._id;
+  const { storeId, productId } = req.params;
+
+  if (!productId || !storeId) {
+    return res.status(400).json({ success: false, message: "storeId and productId required" });
+  }
+
+  try {
+    const userDB = getUserDb();
+    const usersCollection = userDB.collection("users");
+
+    await usersCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      {
+        $pull: {
+          [`wishlists.${storeId}`]: productId, // ✅ keep as string
+        },
       }
-  
-      // Check if productId exists in the user's wishlist array
-      const inWishlist = user.wishlist.includes(productId);
-  
-      // Send response with boolean inWishlist
-      res.status(200).json({ inWishlist });
-    } catch (error) {
-      console.error("Error in /wishlist/check/:productId:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  });
+    );
+
+    res.json({ success: true, message: "Removed from wishlist" });
+  } catch (err) {
+    console.error("Remove from wishlist error:", err);
+    res.status(500).json({ success: false, message: "Remove failed" });
+  }
+});
 
 module.exports = router;
