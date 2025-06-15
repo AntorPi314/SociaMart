@@ -1,5 +1,8 @@
+// src/components/socia/customPost.jsx
+
 import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 function linkify(text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -23,10 +26,69 @@ function linkify(text) {
   });
 }
 
-export default function CustomPost({ name, image, meta, text, liked: likedProp = false }) {
-  const [liked, setLiked] = useState(likedProp);
+export default function CustomPost({
+  name,
+  image,
+  meta,
+  text,
+  likedProp,
+  shopId,
+  postId,
+}) {
+  console.log("🔍 PROPS RECEIVED:", {
+    name,
+    image,
+    meta,
+    text,
+    likedProp,
+    shopId,
+    postId,
+  });
 
-  const toggleLiked = () => setLiked((prev) => !prev);
+  const [liked, setLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Set liked value from props on first render
+  useEffect(() => {
+    setLiked(likedProp);
+  }, [likedProp]);
+
+  const toggleLiked = async () => {
+    if (!shopId || !postId || loading) return;
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("User not logged in");
+        setLoading(false);
+        return;
+      }
+
+      const url = liked
+        ? "http://localhost:3000/like/remove"
+        : "http://localhost:3000/like/add";
+
+      console.log("📤 Sending request to:", url, { shopId, postId });
+
+      await axios.post(
+        url,
+        { shopId, postId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setLiked((prev) => !prev);
+    } catch (error) {
+      console.error("Like toggle failed:", error.response?.data || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white border border-stone-300 rounded-2xl p-4 mb-2 shadow-sm space-y-3 font-sans">
@@ -42,6 +104,7 @@ export default function CustomPost({ name, image, meta, text, liked: likedProp =
         </div>
         <button
           onClick={toggleLiked}
+          disabled={loading}
           aria-label={liked ? "Unlike post" : "Like post"}
           className="flex items-center focus:outline-none"
           type="button"

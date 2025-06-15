@@ -11,7 +11,7 @@ export default function App() {
     <div className="flex h-screen p-3">
       <Sidebar />
       <Mart storeName={storeName} /> {/* ✅ pass to Mart */}
-      <Socia />
+      <Socia storeName={storeName} />
     </div>
   );
 }

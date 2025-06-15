@@ -1,14 +1,14 @@
 // routes/products.js
-
 const express = require("express");
 const router = express.Router();
-const { getUserDb, getProductDb } = require("../db");
-const jwt = require("jsonwebtoken");
+const { getUserDb, getProductDb, getPostDb } = require("../db");
 const { ObjectId } = require("mongodb");
+const optionalAuthenticate = require("../middleware/optionalAuthenticate");
 
-router.get("/products/:storeURL", async (req, res) => {
+router.get("/products/:storeURL", optionalAuthenticate, async (req, res) => {
   try {
     const storeURL = req.params.storeURL;
+
     const userDB = getUserDb();
     const usersCollection = userDB.collection("users");
 
@@ -16,55 +16,39 @@ router.get("/products/:storeURL", async (req, res) => {
       URL: storeURL,
       isShop: true,
     });
-    if (!storeUser)
+
+    if (!storeUser) {
       return res.status(404).json({ success: false, message: "Store not found" });
+    }
 
     let isFollowing = false;
     let wishlistMap = {};
 
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    if (req.user?.userId) {
+      const currentUser = await usersCollection.findOne({
+        _id: new ObjectId(req.user.userId),
+      });
 
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const currentUser = await usersCollection.findOne({
-          _id: new ObjectId(decoded.userId),
-        });
-
-        if (currentUser?.followedStores) {
-          isFollowing = currentUser.followedStores.some((id) =>
-            id.equals(storeUser._id)
-          );
-        }
-
-        if (
-          currentUser?.wishlists &&
-          currentUser.wishlists[storeUser._id.toString()]
-        ) {
-          for (const productId of currentUser.wishlists[
-            storeUser._id.toString()
-          ]) {
-            wishlistMap[productId] = true;
-          }
-        }
-      } catch (err) {
-        console.warn("Invalid token while processing:", err.message);
+      // Follow status
+      if (currentUser?.followedStores?.some(id => id.equals(storeUser._id))) {
+        isFollowing = true;
       }
+
+      // Wishlist map
+      const wishlist = currentUser?.wishlists?.[storeUser._id.toString()] || [];
+      wishlist.forEach(productId => {
+        wishlistMap[productId] = true;
+      });
     }
 
+    // Fetch products
     const productDB = getProductDb();
-    let products = [];
-    try {
-      const productCollection = productDB.collection(storeUser._id.toString());
-      products = await productCollection.find().toArray();
-    } catch (err) {
-      console.warn(`No product collection for user ${storeUser._id}`);
-    }
+    const productCollection = productDB.collection(storeUser._id.toString());
+    const products = await productCollection.find().toArray();
 
-    const productsWithWishlist = products.map((product) => ({
+    const productsWithWishlist = products.map(product => ({
       ...product,
-      wishlist: wishlistMap[product._id.toString()] || false,
+      wishlist: !!wishlistMap[product._id.toString()],
     }));
 
     res.json({
@@ -80,12 +64,11 @@ router.get("/products/:storeURL", async (req, res) => {
       products: productsWithWishlist,
       isFollowing,
     });
+
   } catch (error) {
-    console.error("Error fetching store products:", error);
+    console.error("Error in /products/:storeURL:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
-
 
 module.exports = router;

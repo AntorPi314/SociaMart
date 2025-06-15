@@ -25,4 +25,8 @@ function getProductDb() {
   return client.db("productDB");
 }
 
-module.exports = { client, connectMongo, getDb, getUserDb, getProductDb };
+function getPostDb() {
+  return client.db("postDB");
+}
+
+module.exports = { client, connectMongo, getDb, getUserDb, getProductDb, getPostDb };
