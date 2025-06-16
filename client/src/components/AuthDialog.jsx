@@ -1,5 +1,3 @@
-// src/components/AuthDialog.jsx
-
 import { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -53,19 +51,23 @@ export default function AuthDialog({ open, onClose }) {
             isShop: false,
           });
         } else {
-          // ✅ Save user token & info in localStorage
+          // Save user token & info in localStorage
           localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify({
-            name: data.user.name,
-            email: data.user.email,
-            isShop: data.user.isShop,
-            profilePIC: data.user.profilePIC,
-            URL: data.user.URL,
-            verified: data.user.verified,
-          }));
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              name: data.user.name,
+              email: data.user.email,
+              isShop: data.user.isShop,
+              profilePIC: data.user.profilePIC,
+              URL: data.user.URL,
+              verified: data.user.verified,
+            })
+          );
 
-          // Close after success
-          setTimeout(() => onClose(), 1000);
+          // Close modal and reload current page
+          onClose();
+          window.location.reload();
         }
       } else {
         showToast(data.message, "error");

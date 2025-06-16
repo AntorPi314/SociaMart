@@ -1,8 +1,7 @@
-// src/components/Socia.jsx
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CustomPost from "./socia/customPost.jsx";
+import { User } from "lucide-react"; // Lucide icon
 
 export default function Socia({ storeName }) {
   const [posts, setPosts] = useState([]);
@@ -13,7 +12,7 @@ export default function Socia({ storeName }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // true if token exists
+    setIsLoggedIn(!!token);
 
     if (!storeName) return;
 
@@ -90,10 +89,51 @@ export default function Socia({ storeName }) {
 }
 
 function TopHeader({ isLoggedIn }) {
+  const [profilePic, setProfilePic] = useState(null);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const token = localStorage.getItem("token");
+
+    async function fetchProfilePic() {
+      try {
+        const res = await axios.get("http://localhost:3000/profile/pic", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.data.success && res.data.profilePIC) {
+          setProfilePic(res.data.profilePIC);
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile picture", err);
+      }
+    }
+
+    fetchProfilePic();
+  }, [isLoggedIn]);
+
   return (
-    <div className="w-full h-14 bg-white rounded-xl border border-neutral-300 flex items-center px-4 gap-4">
-      <div className="w-10 h-10 bg-stone-300 rounded-full" />
-      <p className="text-stone-400 text-lg font-inter">
+    <div
+      id="topHeader"
+      className="w-full h-14 bg-white rounded-xl border border-neutral-300 flex items-center px-4 gap-4"
+    >
+      {isLoggedIn ? (
+        <img
+          id="profilePic"
+          src={profilePic || "https://placehold.co/40x40"}
+          alt="Profile"
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          id="profilePic"
+          className="w-10 h-10 bg-stone-200 rounded-full flex items-center justify-center text-stone-500"
+        >
+          <User size={20} />
+        </div>
+      )}
+      <p className="text-stone-400 text-base font-inter">
         {isLoggedIn ? "What's on your mind?" : "Login to post"}
       </p>
     </div>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { User, ShoppingBag, LogOut } from "lucide-react";
-import Vector from "../assets/bx_store.svg"; // Default store icon
+import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
+import Vector from "../assets/bx_store.svg";
 import AuthDialog from "./AuthDialog";
+import axios from "axios";
 
 export default function Root() {
   return (
@@ -33,16 +34,32 @@ function FloatingMenuAccountButton() {
   const [openMenu, setOpenMenu] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setUser(parsed);
-      } catch {
-        setUser(null);
-      }
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      axios
+        .get("http://localhost:3000/profile/pic", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          if (res.data.success && res.data.profilePIC) {
+            setProfilePic(res.data.profilePIC);
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+              try {
+                setUser(JSON.parse(storedUser));
+              } catch {
+                setUser(null);
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching profile pic:", err);
+        });
     }
   }, []);
 
@@ -56,38 +73,39 @@ function FloatingMenuAccountButton() {
   return (
     <div className="relative">
       <button
-        onClick={() => setOpenMenu(!openMenu)}
-        className="w-full h-12 flex items-center justify-center bg-[#19376d] rounded-full overflow-hidden"
+        onClick={() => {
+          if (!user) {
+            setShowAuth(true); // open directly if not logged in
+          } else {
+            setOpenMenu(!openMenu);
+          }
+        }}
+        className={`w-full h-12 flex items-center justify-center rounded-full overflow-hidden ${
+          !profilePic ? "" : ""
+        }`}
       >
-        {user && user.profilePIC ? (
-          // Show profile picture from userDB
+        {profilePic ? (
           <img
-            src={user.profilePIC}
-            alt={user.name || "Profile"}
+            src={profilePic}
+            alt="Profile"
             className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
-          // Show lucide-react User icon if logged out
-          <User className="text-white w-6 h-6" />
+          <User id="userIcon" className="text-white w-6 h-6" />
         )}
       </button>
 
       {openMenu && (
         <div className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10">
-          {!user ? (
-            <div onClick={() => setShowAuth(true)}>
-              <MenuItem icon={<User size={18} />} label="Login / Signup" />
-            </div>
-          ) : (
-            <>
-              <div>
-                <MenuItem icon={<ShoppingBag size={18} />} label="My Orders" />
-              </div>
-              <div onClick={handleLogout}>
-                <MenuItem icon={<LogOut size={18} />} label="Logout" />
-              </div>
-            </>
-          )}
+          <div>
+            <MenuItem icon={<ShoppingBag size={18} />} label="My Orders" />
+          </div>
+          <div>
+            <MenuItem icon={<Settings size={18} />} label="Settings" />
+          </div>
+          <div onClick={handleLogout}>
+            <MenuItem icon={<LogOut size={18} />} label="Logout" />
+          </div>
         </div>
       )}
 

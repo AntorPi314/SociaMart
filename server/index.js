@@ -10,6 +10,7 @@ const wishlistRoutes = require("./routes/wishlist");
 const storesRouter = require("./routes/stores");
 const cartRouter = require("./routes/cart");
 const likeRouter = require("./routes/like");
+const profileRouter = require("./routes/profile");
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use('/', productsRoutes);
 app.use('/', postsRoutes);
 app.use('/', cartRouter);
 app.use('/', likeRouter);
+app.use('/', profileRouter);
 
 async function startServer() {
   try {

@@ -1,8 +1,9 @@
+// src/components/mart/ProductGlobal.jsx
 import React, { useEffect, useState } from "react";
 import { ShoppingCart, Star, Heart as HeartOutline } from "lucide-react";
 import axios from "axios";
 import Toast from "../Toast";
-import ProductDialog from "./ProductDialog"; // Make sure this path is correct
+import ProductDialog from "./ProductDialog";
 
 const ProductGlobal = ({
   id,
@@ -19,7 +20,6 @@ const ProductGlobal = ({
   productId,
 }) => {
   const [isLiked, setIsLiked] = useState(wishlist || false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [toast, setToast] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -28,9 +28,15 @@ const ProductGlobal = ({
     setIsLoggedIn(!!token);
   }, []);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
+
   const handleWishlistToggle = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return alert("Please login to use wishlist");
+    if (!token) return showToast("Please login to use wishlist", "error");
 
     const endpoint = isLiked
       ? `http://localhost:3000/wishlist/remove/${storeId}/${productId}`
@@ -57,17 +63,24 @@ const ProductGlobal = ({
 
       if (res.data.success) {
         setIsLiked(!isLiked);
+        showToast(
+          isLiked ? "Removed from wishlist" : "Added to wishlist",
+          "success"
+        );
       } else {
-        console.warn("⚠️ Wishlist response failed", res.data);
+        showToast(res.data.message || "Something went wrong", "error");
       }
     } catch (err) {
-      console.error("❌ Wishlist toggle error:", err?.response?.data || err.message);
+      showToast(
+        err?.response?.data?.message || "Wishlist update failed",
+        "error"
+      );
     }
   };
 
   const handleBuyNow = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return alert("Please login to add to cart");
+    if (!token) return showToast("Please login to add to cart", "error");
 
     try {
       const res = await axios.post(
@@ -82,18 +95,15 @@ const ProductGlobal = ({
       );
 
       if (res.data.success) {
-        setToast({ message: "✅ Added to cart", type: "success" });
+        showToast("✅ Added to cart", "success");
       } else {
-        setToast({
-          message: res.data.message || "⚠️ Already in cart",
-          type: "error",
-        });
+        showToast(res.data.message || "⚠️ Already in cart", "error");
       }
     } catch (err) {
-      setToast({
-        message: err?.response?.data?.message || "❌ Failed to add to cart",
-        type: "error",
-      });
+      showToast(
+        err?.response?.data?.message || "❌ Failed to add to cart",
+        "error"
+      );
     }
   };
 
@@ -111,7 +121,7 @@ const ProductGlobal = ({
         </div>
       )}
 
-      {/* Product Image (clickable) */}
+      {/* Product Image */}
       <div className="relative cursor-pointer" onClick={() => setShowDialog(true)}>
         <img
           src={images?.[0] || "https://via.placeholder.com/300x200?text=Product"}
@@ -175,7 +185,7 @@ const ProductGlobal = ({
         </div>
       </div>
 
-      {/* Toast message */}
+      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
