@@ -7,7 +7,7 @@ import App from "./App.jsx";
 import About from "./About.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
@@ -15,6 +15,6 @@ createRoot(document.getElementById("root")).render(
         <Route path="/:storeName" element={<App />} /> {/* 🔥 Dynamic Route */}
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  // </StrictMode>
 );
 

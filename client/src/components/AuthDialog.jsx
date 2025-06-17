@@ -1,3 +1,4 @@
+// src/components/AuthDialog.jsx
 import { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -6,11 +7,18 @@ import Toast from "./Toast";
 export default function AuthDialog({ open, onClose }) {
   const [isSignup, setIsSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000
+    );
   };
 
   const [form, setForm] = useState({
@@ -35,7 +43,10 @@ export default function AuthDialog({ open, onClose }) {
     const endpoint = isSignup ? "/signup" : "/login";
 
     try {
-      const { data } = await axios.post(`http://localhost:3000${endpoint}`, form);
+      const { data } = await axios.post(
+        `http://localhost:3000${endpoint}`,
+        form
+      );
 
       if (data.success) {
         showToast(data.message, "success");
@@ -56,12 +67,9 @@ export default function AuthDialog({ open, onClose }) {
           localStorage.setItem(
             "user",
             JSON.stringify({
-              name: data.user.name,
+              _id: data.user._id,
               email: data.user.email,
               isShop: data.user.isShop,
-              profilePIC: data.user.profilePIC,
-              URL: data.user.URL,
-              verified: data.user.verified,
             })
           );
 

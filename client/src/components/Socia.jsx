@@ -1,7 +1,9 @@
+// src/components/Socia.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CustomPost from "./socia/customPost.jsx";
-import { User } from "lucide-react"; // Lucide icon
+import CreatePost from "./socia/CreatePost.jsx";
+import { User } from "lucide-react";
 
 export default function Socia({ storeName }) {
   const [posts, setPosts] = useState([]);
@@ -9,6 +11,7 @@ export default function Socia({ storeName }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showPostDialog, setShowPostDialog] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -22,12 +25,16 @@ export default function Socia({ storeName }) {
     async function fetchPosts() {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await axios.get(`http://localhost:3000/posts/${storeName}`, {
-          headers,
-        });
+        const res = await axios.get(
+          `http://localhost:3000/posts/${storeName}`,
+          { headers }
+        );
 
         if (res.data.success && Array.isArray(res.data.posts)) {
-          setPosts(res.data.posts);
+          const sortedPosts = res.data.posts.sort(
+            (a, b) => new Date(b.createAt) - new Date(a.createAt)
+          );
+          setPosts(sortedPosts);
           setStoreId(res.data.storeId);
         } else {
           setPosts([]);
@@ -47,14 +54,47 @@ export default function Socia({ storeName }) {
     fetchPosts();
   }, [storeName]);
 
+  const getTimeAgo = (dateString) => {
+    if (!dateString) return "Unknown date";
+
+    const now = new Date();
+    const past = new Date(dateString);
+    const diff = (now - past) / 1000; // in seconds
+
+    if (diff < 60) return `1m`; // Always show at least "1m", never seconds
+    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+
+    const daysAgo = Math.floor(diff / 86400);
+    if (daysAgo < 7) return `${daysAgo}d`;
+
+    if (now.getFullYear() === past.getFullYear()) {
+      return past.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+      });
+    }
+
+    return past.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="w-[400px] h-full flex flex-col rounded-xl overflow-hidden bg-white">
       <div className="h-20 flex items-center justify-between">
-        <TopHeader isLoggedIn={isLoggedIn} />
+        <TopHeader
+          isLoggedIn={isLoggedIn}
+          onClickPost={() => setShowPostDialog(true)}
+        />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-2 bg-[#EDF0F9] rounded-t-2xl border-t-8 border-[#EDF0F9]">
-        {loading && <p className="text-center text-gray-500">Loading posts...</p>}
+      <div className="flex-1 overflow-y-auto bg-[#EDF0F9] rounded-2xl border-8 border-[#EDF0F9]">
+        {loading && (
+          <p className="text-center text-gray-500">Loading posts...</p>
+        )}
         {error && <p className="text-center text-red-500">{error}</p>}
         {!loading && !error && posts.length === 0 && (
           <p className="text-center text-gray-500">No posts found</p>
@@ -63,32 +103,40 @@ export default function Socia({ storeName }) {
         {!loading &&
           !error &&
           posts.map((post) => {
-            const timestamp = post.createAt?.t
-              ? new Date(post.createAt.t * 1000)
-              : null;
-
-            const formattedDate = timestamp?.toLocaleDateString() || "Unknown date";
-            const formattedTime = timestamp?.toLocaleTimeString() || "";
+            const timeAgo = getTimeAgo(post.createAt);
 
             return (
               <CustomPost
                 key={post._id}
+                owner_id={post.owner_id || "Anonymous"}
                 name={post.owner_name || "Anonymous"}
                 image={post.owner_profilePIC || "https://placehold.co/55x55"}
-                meta={`${post.likeCount || 0} Liked | ${formattedDate} | ${formattedTime}`}
+                likeCount={post.likeCount || 0}
+                timeAgo={timeAgo}
                 text={post.text}
                 likedProp={post.liked}
                 shopId={storeId}
                 postId={post._id}
+                onDelete={(deletedPostId) => {
+                  setPosts((prevPosts) =>
+                    prevPosts.filter((p) => p._id !== deletedPostId)
+                  );
+                }}
               />
             );
           })}
       </div>
+
+      <CreatePost
+        open={showPostDialog}
+        onClose={() => setShowPostDialog(false)}
+        storeName={storeName}
+      />
     </div>
   );
 }
 
-function TopHeader({ isLoggedIn }) {
+function TopHeader({ isLoggedIn, onClickPost }) {
   const [profilePic, setProfilePic] = useState(null);
 
   useEffect(() => {
@@ -116,7 +164,10 @@ function TopHeader({ isLoggedIn }) {
   return (
     <div
       id="topHeader"
-      className="w-full h-14 bg-white rounded-xl border border-neutral-300 flex items-center px-4 gap-4"
+      className={`w-full h-14 bg-white rounded-xl border border-neutral-300 flex items-center px-4 gap-4 ${
+        isLoggedIn ? "cursor-pointer hover:bg-neutral-100" : ""
+      }`}
+      onClick={() => isLoggedIn && onClickPost()}
     >
       {isLoggedIn ? (
         <img

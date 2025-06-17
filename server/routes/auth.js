@@ -1,3 +1,4 @@
+// routes/auth.js
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -91,11 +92,9 @@ router.post('/login', async (req, res) => {
       message: 'Login successful',
       token,
       user: {
-        name: user.name,
+        _id: user._id,
         email: user.email,
         isShop: user.isShop,
-        followers: user.followers || 0,
-        verified: user.verified || false,
       },
     });
   } catch (error) {
