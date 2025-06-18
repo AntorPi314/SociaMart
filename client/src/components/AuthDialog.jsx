@@ -44,7 +44,7 @@ export default function AuthDialog({ open, onClose }) {
 
     try {
       const { data } = await axios.post(
-        `http://localhost:3000${endpoint}`,
+        `https://sociamart.onrender.com${endpoint}`,
         form
       );
 
