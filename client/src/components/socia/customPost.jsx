@@ -60,8 +60,8 @@ export default function CustomPost({
       }
 
       const url = liked
-        ? "http://localhost:3000/like/remove"
-        : "http://localhost:3000/like/add";
+        ? "https://sociamart.onrender.com/like/remove"
+        : "https://sociamart.onrender.com/like/add";
 
       await axios.post(
         url,
@@ -99,7 +99,7 @@ export default function CustomPost({
         return;
       }
 
-      await axios.delete(`http://localhost:3000/post/${shopId}/${postId}`, {
+      await axios.delete(`https://sociamart.onrender.com/post/${shopId}/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

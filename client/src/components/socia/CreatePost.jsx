@@ -28,7 +28,7 @@ export default function CreatePost({ open, onClose, storeName }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:3000/post/${storeName}`,
+        `https://sociamart.onrender.com/post/${storeName}`,
         { text },
         { headers: { Authorization: `Bearer ${token}` } }
       );
