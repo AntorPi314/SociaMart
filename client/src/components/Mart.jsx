@@ -6,7 +6,9 @@ import Vector from "../assets/bx_store.svg";
 import ProductGlobal from "./mart/ProductGlobal";
 import CrudProductDialog from "./mart/createProductDialog";
 
-export default function Mart({ storeName }) {
+export default function Mart() {
+  const storeName = window.location.pathname.split("/").filter(Boolean).pop();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [storeInfo, setStoreInfo] = useState(undefined);
