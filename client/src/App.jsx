@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import { useParams } from "react-router-dom";
 import Sidebar from "./components/Sidebar.jsx";
