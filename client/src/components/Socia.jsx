@@ -5,6 +5,8 @@ import CustomPost from "./socia/customPost.jsx";
 import CreatePost from "./socia/CreatePost.jsx";
 import { User } from "lucide-react";
 
+
+
 export default function Socia({ storeName }) {
   const [posts, setPosts] = useState([]);
   const [storeId, setStoreId] = useState(null);

@@ -5,6 +5,7 @@ const { connectMongo } = require('./db');
 
 const authRoutes = require('./routes/auth');
 const productsRoutes = require('./routes/products');
+const createProductRoutes = require('./routes/createProduct');
 const postsRoutes = require('./routes/posts');
 const postRoutes = require('./routes/post');
 const wishlistRoutes = require("./routes/wishlist");
@@ -21,6 +22,7 @@ const port = process.env.PORT || 3000;
 app.use("/stores", storesRouter);
 app.use("/", wishlistRoutes);
 app.use('/', authRoutes);
+app.use('/', createProductRoutes);
 app.use('/', productsRoutes);
 app.use('/', postRoutes);
 app.use('/', postsRoutes);

@@ -1,9 +1,11 @@
 // src/components/mart/ProductGlobal.jsx
 import React, { useEffect, useState } from "react";
-import { ShoppingCart, Star, Heart as HeartOutline } from "lucide-react";
+import { ShoppingCart, Star, Heart as HeartOutline, Trash2 } from "lucide-react";
 import axios from "axios";
 import Toast from "../Toast";
 import ProductDialog from "./ProductDialog";
+import EditProductDialog from "./editProductDialog";
+import DeleteProductDialog from "./deleteProductDialog";
 
 const ProductGlobal = ({
   id,
@@ -18,17 +20,24 @@ const ProductGlobal = ({
   wishlist,
   storeId,
   productId,
+  shopId = storeId,
 }) => {
   const [isLiked, setIsLiked] = useState(wishlist || false);
   const [toast, setToast] = useState(null);
-  const [showDialog, setShowDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(null); // "view" | "edit" | "delete"
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        setUserId(userObj._id || userObj.id || null);
+      }
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+    }
   }, []);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -48,9 +57,7 @@ const ProductGlobal = ({
       let res;
       if (isLiked) {
         res = await axios.delete(endpoint, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
       } else {
         res = await axios.post(endpoint, payload, {
@@ -107,6 +114,8 @@ const ProductGlobal = ({
     }
   };
 
+  const canEdit = userId && (userId === storeId || userId === shopId);
+
   return (
     <div className="w-[242px] h-full bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 p-3 flex flex-col">
       {!hideShop && (
@@ -117,12 +126,19 @@ const ProductGlobal = ({
             className="w-4 h-4"
           />
           <span className="font-medium">Best Buy Store</span>
-          <span className="text-blue-500 font-semibold cursor-pointer">• Follow</span>
+          <span className="text-blue-500 font-semibold cursor-pointer">
+            • Follow
+          </span>
         </div>
       )}
 
       {/* Product Image */}
-      <div className="relative cursor-pointer" onClick={() => setShowDialog(true)}>
+      <div
+        className="relative cursor-pointer"
+        onClick={() => {
+          setShowDialog(canEdit ? "edit" : "view");
+        }}
+      >
         <img
           src={images?.[0] || "https://via.placeholder.com/300x200?text=Product"}
           alt={name}
@@ -194,10 +210,10 @@ const ProductGlobal = ({
         />
       )}
 
-      {/* Product Dialog */}
-      {showDialog && (
+      {/* Dialogs */}
+      {showDialog === "view" && (
         <ProductDialog
-          onClose={() => setShowDialog(false)}
+          onClose={() => setShowDialog(null)}
           id={id}
           name={name}
           price={price}
@@ -206,6 +222,37 @@ const ProductGlobal = ({
           left={left}
           images={images}
           description={description}
+          storeId={storeId}
+        />
+      )}
+
+      {showDialog === "edit" && (
+        <EditProductDialog
+          open={true}
+          onClose={() => setShowDialog(null)}
+          storeId={storeId}
+          product={{
+            _id: productId,
+            title: name,
+            des: description,
+            price,
+            price_old: priceOld,
+            rating,
+            left,
+            images,
+          }}
+        />
+      )}
+
+      {showDialog === "delete" && (
+        <DeleteProductDialog
+          open={true}
+          onClose={() => setShowDialog(null)}
+          storeId={storeId}
+          product={{
+            _id: productId,
+            title: name,
+          }}
         />
       )}
     </div>

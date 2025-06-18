@@ -8,7 +8,7 @@ const { getPostDb } = require("../db");
 router.post("/like/add", authenticate, async (req, res) => {
   try {
     const { shopId, postId } = req.body;
-    console.log("Incoming request to /like/add:", { shopId, postId });
+    // console.log("Incoming request to /like/add:", { shopId, postId });
 
     if (!shopId || !postId) {
       return res.status(400).json({ success: false, message: "shopId and postId required" });
@@ -34,7 +34,7 @@ router.post("/like/add", authenticate, async (req, res) => {
 
     res.json({ success: true, message: "Liked" });
   } catch (err) {
-    console.error("Error in /like/add:", err);
+    // console.error("Error in /like/add:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
@@ -43,7 +43,7 @@ router.post("/like/add", authenticate, async (req, res) => {
 router.post("/like/remove", authenticate, async (req, res) => {
   try {
     const { shopId, postId } = req.body;
-    console.log("Incoming request to /like/remove:", { shopId, postId });
+    // console.log("Incoming request to /like/remove:", { shopId, postId });
 
     if (!shopId || !postId) {
       return res.status(400).json({ success: false, message: "shopId and postId required" });

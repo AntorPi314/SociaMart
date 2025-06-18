@@ -4,6 +4,7 @@ import axios from "axios";
 import { Filter, Search } from "lucide-react";
 import Vector from "../assets/bx_store.svg";
 import ProductGlobal from "./mart/ProductGlobal";
+import CrudProductDialog from "./mart/createProductDialog";
 
 export default function Mart({ storeName }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,6 +14,9 @@ export default function Mart({ storeName }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const userId = JSON.parse(localStorage.getItem("user"))?._id;
+  const [showCrud, setShowCrud] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
@@ -20,7 +24,10 @@ export default function Mart({ storeName }) {
     async function fetchStoreProducts() {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await axios.get(`http://localhost:3000/products/${storeName}`, { headers });
+        const res = await axios.get(
+          `http://localhost:3000/products/${storeName}`,
+          { headers }
+        );
         if (res.data.success) {
           setStoreInfo(res.data.user);
           setProducts(res.data.products || []);
@@ -99,6 +106,7 @@ export default function Mart({ storeName }) {
             isFollowing={isFollowing}
             onFollowClick={handleFollowToggle}
             isLoggedIn={isLoggedIn}
+            setShowCrud={setShowCrud}
           />
         )}
 
@@ -112,11 +120,7 @@ export default function Mart({ storeName }) {
           />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-red-600 font-semibold">
-            <img
-              src="/assets/error.svg"
-              alt="Error Icon"
-              className="w-8 h-8"
-            />
+            <img src="/assets/error.svg" alt="Error Icon" className="w-8 h-8" />
             <span className="text-lg font-bold">
               Shop '{storeName}' not found
             </span>
@@ -133,6 +137,13 @@ export default function Mart({ storeName }) {
           </div>
         )}
       </div>
+      {showCrud && (
+        <CrudProductDialog
+          open={showCrud}
+          onClose={() => setShowCrud(false)}
+          storeId={storeInfo?._id}
+        />
+      )}
     </div>
   );
 }
@@ -147,15 +158,29 @@ function formatFollowers(num) {
   return num.toString();
 }
 
-function TopHeader1({ storeInfo, isFollowing, onFollowClick, isLoggedIn }) {
+function TopHeader1({ storeInfo, isFollowing, onFollowClick, isLoggedIn, setShowCrud }) {
   const name = storeInfo?.name || "Best Buy Store";
   const profilePIC = storeInfo?.profilePIC || Vector;
   const followers = storeInfo?.followers || 0;
   const isVerified = storeInfo?.verified || false;
+  const userId = JSON.parse(localStorage.getItem("user"))?._id;
+
+console.log("User ID:", userId);
+console.log("Store ID:", storeInfo?._id);
+console.log("Match:", userId === storeInfo?._id);
 
   return (
     <div className="flex items-center gap-4 mb-4 px-4">
-      <img className="w-14 h-14 rounded-full" src={profilePIC} alt="Store" />
+      <img
+        id="profilePic_img"
+        className="w-14 h-14 rounded-full cursor-pointer"
+        src={profilePIC}
+        onClick={() => {
+          if (userId === storeInfo?._id) setShowCrud(true);
+        }}
+        alt="Store"
+      />
+
       <div className="flex flex-col">
         <div className="flex items-center gap-1">
           <h2 className="text-lg font-semibold">{name}</h2>
