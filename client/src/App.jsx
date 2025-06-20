@@ -9,7 +9,7 @@ export default function App() {
   const { storeName } = useParams(); // ✅ get from route like /BestBuyStore
 
   return (
-    <div className="flex h-screen p-3">
+    <div className="flex h-screen p-1.5">
       <Sidebar />
       <Mart storeName={storeName} /> {/* ✅ pass to Mart */}
       <Socia storeName={storeName} />
