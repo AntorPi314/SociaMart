@@ -13,6 +13,7 @@ const storesRouter = require("./routes/stores");
 const cartRouter = require("./routes/cart");
 const likeRouter = require("./routes/like");
 const profileRouter = require("./routes/profile");
+const ordersRouter = require("./routes/orders");
 
 const app = express();
 app.use(express.json());
@@ -29,6 +30,7 @@ app.use('/', postsRoutes);
 app.use('/', cartRouter);
 app.use('/', likeRouter);
 app.use('/', profileRouter);
+app.use('/', ordersRouter);
 
 async function startServer() {
   try {
