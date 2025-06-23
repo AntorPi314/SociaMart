@@ -73,7 +73,7 @@ function BarButton2() {
 function BarButton3() {
   return (
     <div
-      id="my-shop"
+      id="my-followed-shop"
       className="relative w-auto h-12 flex items-center justify-center cursor-pointer"
     >
       <Store color="white" />

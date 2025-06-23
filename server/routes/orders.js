@@ -70,7 +70,7 @@ router.post("/order", authenticateToken, async (req, res) => {
             image: product.images?.[0] || "/assets/default.jpg",
             quantity,
             price: unitPrice * quantity,
-            status: "Confirm",
+            status: "Processing",
             createAt: new Date(),
             address,
             phone,

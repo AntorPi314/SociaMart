@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import axios from "axios";
 import AuthDialog from "../AuthDialog";
+import EditSettings from "../sidebar/editSettings"; // ✅ imported
 
 export default function FloatingMenuAccountButton() {
   const [openMenu, setOpenMenu] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
+  const [showSettings, setShowSettings] = useState(false); // ✅ new state
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -70,7 +72,15 @@ export default function FloatingMenuAccountButton() {
       {openMenu && (
         <div className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10">
           <MenuItem icon={<ShoppingBag size={18} />} label="My Orders" />
-          <MenuItem icon={<Settings size={18} />} label="Settings" />
+          <MenuItem
+            id="settings"
+            icon={<Settings size={18} />}
+            label="Settings"
+            onClick={() => {
+              setShowSettings(true);
+              setOpenMenu(false);
+            }}
+          />
           <div onClick={handleLogout}>
             <MenuItem icon={<LogOut size={18} />} label="Logout" />
           </div>
@@ -78,13 +88,30 @@ export default function FloatingMenuAccountButton() {
       )}
 
       <AuthDialog open={showAuth} onClose={() => setShowAuth(false)} />
+
+      {showSettings && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+          onClick={() => setShowSettings(false)}
+        >
+          <div
+            className="bg-white max-h-[90vh] overflow-y-auto rounded-xl shadow-xl p-6 w-full max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <EditSettings onClose={() => setShowSettings(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function MenuItem({ icon, label }) {
+function MenuItem({ icon, label, onClick }) {
   return (
-    <div className="flex items-center gap-2 px-4 py-2 hover:bg-[#1e2e4a] cursor-pointer">
+    <div
+      className="flex items-center gap-2 px-4 py-2 hover:bg-[#1e2e4a] cursor-pointer"
+      onClick={onClick}
+    >
       {icon}
       <span>{label}</span>
     </div>

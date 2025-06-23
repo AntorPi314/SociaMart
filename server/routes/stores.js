@@ -1,5 +1,4 @@
 // routes/stores.js
-
 const express = require("express");
 const router = express.Router();
 const { getUserDb } = require("../db");
@@ -7,6 +6,30 @@ const authenticateToken = require("../middleware/authMiddleware");
 const { ObjectId } = require("mongodb");  // <-- Import ObjectId properly
 
 const userDB = getUserDb();
+
+// Add this route in routes/stores.js
+router.get("/followed/list", authenticateToken, async (req, res) => {
+  try {
+    const currentUserId = req.user.userId;
+
+    const user = await userDB.collection("users").findOne({ _id: new ObjectId(currentUserId) });
+    if (!user || !Array.isArray(user.followedStores)) {
+      return res.json({ success: true, stores: [] });
+    }
+
+    const stores = await userDB
+      .collection("users")
+      .find({ _id: { $in: user.followedStores.map(id => new ObjectId(id)) }, isShop: true })
+      .project({ _id: 1, name: 1, profilePIC: 1, URL: 1 })
+      .toArray();
+
+    res.json({ success: true, stores });
+  } catch (err) {
+    console.error("Error fetching followed stores:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 router.get("/:storeURL", authenticateToken, async (req, res) => {
   try {
