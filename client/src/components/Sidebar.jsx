@@ -1,15 +1,20 @@
-// src/components/Sidebar.jsx
 import { useState, useEffect } from "react";
-import { House, ArrowLeftRight, Store, Heart, ShoppingCart } from "lucide-react";
+import {
+  House,
+  ArrowLeftRight,
+  Store,
+  Heart,
+  ShoppingCart,
+} from "lucide-react";
 import FloatingMenuAccountButton from "./sidebar/FloatingMenuAccountButton";
 import ShowWishlistDialog from "./mart/showWishlistDialog";
 import ShowCartDialog from "./mart/showCartDialog";
-import ShowFollowedShop from "./sidebar/showFollowedShop"; // ✅
+import ShowFollowedShop from "./sidebar/showFollowedShop";
 
 export default function Sidebar() {
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [followedShopOpen, setFollowedShopOpen] = useState(false); // ✅
+  const [followedShopOpen, setFollowedShopOpen] = useState(false);
 
   useEffect(() => {
     const followedShopBtn = document.getElementById("my-followed-shop");
@@ -19,13 +24,21 @@ export default function Sidebar() {
         setFollowedShopOpen(true);
       };
     }
+
+    const toggleBtn = document.getElementById("hide-show");
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        const event = new Event("toggle-socia");
+        window.dispatchEvent(event);
+      };
+    }
   }, []);
 
   return (
     <div className="w-16 flex flex-col justify-between bg-[#06142E] py-4 rounded-[12px]">
       <div>
         <BarButton1 />
-        <BarButton2 />
+        <BarButton2 /> {/* Mobile-only */}
         <BarButton3 />
       </div>
       <div>
@@ -34,17 +47,19 @@ export default function Sidebar() {
         <FloatingMenuAccountButton />
       </div>
 
-      {/* Dialogs */}
       <ShowWishlistDialog open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
       <ShowCartDialog open={cartOpen} onClose={() => setCartOpen(false)} />
-      <ShowFollowedShop open={followedShopOpen} onClose={() => setFollowedShopOpen(false)} /> {/* ✅ */}
+      <ShowFollowedShop open={followedShopOpen} onClose={() => setFollowedShopOpen(false)} />
     </div>
   );
 }
 
 function BarButton1() {
   return (
-    <div id="home" className="relative w-auto h-12 flex items-center justify-center cursor-pointer">
+    <div
+      id="home"
+      className="relative w-auto h-12 flex items-center justify-center cursor-pointer"
+    >
       <House color="white" />
     </div>
   );
@@ -52,7 +67,10 @@ function BarButton1() {
 
 function BarButton2() {
   return (
-    <div id="hide-show-Socia" className="relative w-auto h-12 flex items-center justify-center cursor-pointer">
+    <div
+      id="hide-show"
+      className="relative w-auto h-12 flex items-center justify-center cursor-pointer block md:hidden"
+    >
       <ArrowLeftRight color="white" />
     </div>
   );
@@ -60,7 +78,10 @@ function BarButton2() {
 
 function BarButton3() {
   return (
-    <div id="my-followed-shop" className="relative w-auto h-12 flex items-center justify-center cursor-pointer">
+    <div
+      id="my-followed-shop"
+      className="relative w-auto h-12 flex items-center justify-center cursor-pointer"
+    >
       <Store color="white" />
     </div>
   );

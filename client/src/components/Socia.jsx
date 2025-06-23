@@ -85,7 +85,7 @@ export default function Socia({ storeName }) {
   };
 
   return (
-    <div className="w-[400px] h-full flex flex-col rounded-xl overflow-hidden bg-white">
+    <div className="h-full ml-2 flex flex-col rounded-xl overflow-hidden bg-white">
       <div className="h-20 flex items-center justify-between">
         <TopHeader
           isLoggedIn={isLoggedIn}

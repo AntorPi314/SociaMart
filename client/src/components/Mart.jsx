@@ -97,7 +97,7 @@ export default function Mart({ storeName }) {
     });
 
   return (
-    <div className="flex flex-col flex-1 mx-3 rounded-[12px] overflow-hidden bg-white">
+    <div className="flex flex-col flex-1 ml-1.5 rounded-[12px] overflow-hidden bg-white">
       <div className="h-[80px] flex justify-between items-center px-4">
         {/* Hide TopHeader1 if store not found */}
         {storeInfo !== null && (
