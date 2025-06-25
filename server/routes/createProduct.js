@@ -28,6 +28,7 @@ router.post("/createProduct/:storeId", authenticateToken, async (req, res) => {
       left: left || 0,
       images: images || [],
       rating: 0,
+      ratingCount: 0,
     };
 
     const productDB = getProductDb();

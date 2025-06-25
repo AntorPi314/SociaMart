@@ -3,14 +3,18 @@ import { useEffect, useState } from "react";
 import { User, ShoppingBag, LogOut, Settings } from "lucide-react";
 import axios from "axios";
 import AuthDialog from "../AuthDialog";
-import EditSettings from "../sidebar/editSettings"; // ✅ imported
+import EditSettings from "../sidebar/editSettings";
+import MyOrderDialog from "../mart/myOrderDialog"; // ✅ Import
+import ManageOrder from "../mart/manageOrder"; // ✅ Import
 
 export default function FloatingMenuAccountButton() {
   const [openMenu, setOpenMenu] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
-  const [showSettings, setShowSettings] = useState(false); // ✅ new state
+  const [showSettings, setShowSettings] = useState(false);
+  const [showMyOrders, setShowMyOrders] = useState(false); // ✅ For customers
+  const [showManageOrders, setShowManageOrders] = useState(false); // ✅ For shop owners
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -70,8 +74,30 @@ export default function FloatingMenuAccountButton() {
       </button>
 
       {openMenu && (
-        <div className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10">
-          <MenuItem icon={<ShoppingBag size={18} />} label="My Orders" />
+        <div
+          id="myOrdersOption"
+          className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10"
+        >
+          {user?.isShop ? (
+            <MenuItem
+              icon={<ShoppingBag size={18} />}
+              label="Manage Orders"
+              onClick={() => {
+                setShowManageOrders(true);
+                setOpenMenu(false);
+              }}
+            />
+          ) : (
+            <MenuItem
+              icon={<ShoppingBag size={18} />}
+              label="My Orders"
+              onClick={() => {
+                setShowMyOrders(true);
+                setOpenMenu(false);
+              }}
+            />
+          )}
+
           <MenuItem
             id="settings"
             icon={<Settings size={18} />}
@@ -101,6 +127,14 @@ export default function FloatingMenuAccountButton() {
             <EditSettings onClose={() => setShowSettings(false)} />
           </div>
         </div>
+      )}
+
+      {showMyOrders && (
+        <MyOrderDialog open={showMyOrders} onClose={() => setShowMyOrders(false)} />
+      )}
+
+      {showManageOrders && user && (
+        <ManageOrder open={showManageOrders} onClose={() => setShowManageOrders(false)} shopId={user._id} />
       )}
     </div>
   );

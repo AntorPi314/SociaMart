@@ -7,6 +7,32 @@ const { ObjectId } = require("mongodb");  // <-- Import ObjectId properly
 
 const userDB = getUserDb();
 
+// GET shop info by store ID (used in myOrderDialog)
+router.get("/info/:id", async (req, res) => {
+  try {
+    const storeId = req.params.id;
+
+    const store = await userDB.collection("users").findOne({
+      _id: new ObjectId(storeId),
+      isShop: true,
+    });
+
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    res.json({
+      name: store.name || "Shop",
+      profilePIC: store.profilePIC || "/assets/bx_store.svg",
+      URL: store.URL || "",
+    });
+  } catch (err) {
+    console.error("Error fetching store info by ID:", err);
+    res.status(500).json({ message: "Failed to fetch store info" });
+  }
+});
+
+
 // Add this route in routes/stores.js
 router.get("/followed/list", authenticateToken, async (req, res) => {
   try {
