@@ -1,6 +1,6 @@
 // src/components/mart/ProductGlobal.jsx
 import React, { useEffect, useState } from "react";
-import { ShoppingCart, Star, Heart as HeartOutline, Trash2 } from "lucide-react";
+import { ShoppingCart, Star, Heart as HeartOutline } from "lucide-react";
 import axios from "axios";
 import Toast from "../Toast";
 import ProductDialog from "./ProductDialog";
@@ -26,6 +26,7 @@ const ProductGlobal = ({
   const [toast, setToast] = useState(null);
   const [showDialog, setShowDialog] = useState(null); // "view" | "edit" | "delete"
   const [userId, setUserId] = useState(null);
+  const [isShop, setIsShop] = useState(false);
 
   useEffect(() => {
     try {
@@ -33,6 +34,7 @@ const ProductGlobal = ({
       if (userStr) {
         const userObj = JSON.parse(userStr);
         setUserId(userObj._id || userObj.id || null);
+        setIsShop(userObj.isShop === true);
       }
     } catch (e) {
       console.error("Failed to parse user from localStorage", e);
@@ -89,6 +91,10 @@ const ProductGlobal = ({
     const token = localStorage.getItem("token");
     if (!token) return showToast("Please login to add to cart", "error");
 
+    if (isShop) {
+      return showToast("A shop can not buy from another shop", "error");
+    }
+
     try {
       const res = await axios.post(
         "https://sociamart.onrender.com/cart/add",
@@ -140,7 +146,9 @@ const ProductGlobal = ({
         }}
       >
         <img
-          src={images?.[0] || "https://via.placeholder.com/300x200?text=Product"}
+          src={
+            images?.[0] || "https://via.placeholder.com/300x200?text=Product"
+          }
           alt={name}
           className="w-full h-36 object-cover rounded-md"
         />
@@ -162,7 +170,9 @@ const ProductGlobal = ({
 
         <div className="flex items-center gap-2 mt-2">
           <span className="text-red-600 text-lg font-bold">${price}</span>
-          <span className="text-gray-400 line-through text-sm">${priceOld}</span>
+          <span className="text-gray-400 line-through text-sm">
+            ${priceOld}
+          </span>
         </div>
 
         <div className="mt-auto pt-4 flex items-center justify-between">
@@ -192,8 +202,18 @@ const ProductGlobal = ({
           </button>
 
           <button
-            className="flex items-center gap-2 bg-indigo-100 text-indigo-600 font-semibold px-4 py-2 rounded-xl hover:bg-indigo-200 transition"
-            onClick={handleBuyNow}
+            className={`flex items-center gap-2 font-semibold px-4 py-2 rounded-xl transition ${
+              isShop
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-indigo-100 text-indigo-600 hover:bg-indigo-200"
+            }`}
+            onClick={() => {
+              if (isShop) {
+                showToast("A shop can not buy from another shop", "error");
+              } else {
+                handleBuyNow();
+              }
+            }}
           >
             <ShoppingCart className="w-5 h-5" />
             Buy Now

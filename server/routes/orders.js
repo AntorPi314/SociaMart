@@ -195,9 +195,14 @@ router.post("/order", authenticateToken, async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    if (user.isShop === true) {
+      return res.status(403).json({ success: false, message: "Shop owners are not allowed to place orders" });
+    }
+
     const name = user.name || "No Name";
     const address = user.address || "No address";
     const phone = user.phone || "No phone";
+
     const insertedOrders = [];
 
     for (const [storeId, items] of Object.entries(orders)) {
@@ -292,5 +297,6 @@ router.post("/order", authenticateToken, async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to place orders" });
   }
 });
+
 
 module.exports = router;

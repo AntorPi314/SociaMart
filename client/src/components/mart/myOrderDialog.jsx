@@ -20,7 +20,7 @@ export default function MyOrderDialog({ open, onClose }) {
       const token = localStorage.getItem("token");
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:3000/my-orders", {
+        const res = await axios.get("https://sociamart.onrender.com/my-orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -44,7 +44,7 @@ export default function MyOrderDialog({ open, onClose }) {
         const shopResponses = await Promise.all(
           shopIds.map((id) =>
             axios
-              .get(`http://localhost:3000/stores/info/${id}`)
+              .get(`https://sociamart.onrender.com/stores/info/${id}`)
               .then((res) => res.data)
               .catch(() => null)
           )
@@ -70,13 +70,11 @@ export default function MyOrderDialog({ open, onClose }) {
   const handleRatingSubmit = async (order, ratingValue) => {
     const token = localStorage.getItem("token");
 
-    // ✅ Frontend rating validation
     if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
       setToast({ message: "Invalid rating value", type: "error" });
       return;
     }
 
-    // ✅ Defensive fallback for IDs
     const product_id = order?.product_id;
     const order_id = order?._id;
     const store_id = order?.storeId;
@@ -88,7 +86,7 @@ export default function MyOrderDialog({ open, onClose }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/rate-product",
+        "https://sociamart.onrender.com/rate-product",
         {
           product_id,
           order_id,
@@ -121,6 +119,12 @@ export default function MyOrderDialog({ open, onClose }) {
         type: "error",
       });
     }
+  };
+
+  const getStatusBadgeClass = (status) => {
+    if (status === "Delivered") return "bg-green-600 text-white";
+    if (status === "Cancel") return "bg-red-600 text-white";
+    return "bg-gray-600 text-white";
   };
 
   if (!open) return null;
@@ -185,10 +189,14 @@ export default function MyOrderDialog({ open, onClose }) {
                                 <p className="text-sm font-medium">
                                   {order.title}
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                  Status: {order.status}
-                                </p>
-                                <p className="text-xs text-gray-400">
+                                <span
+                                  className={`inline-block text-xs px-3 py-1 rounded-full mt-1 ${getStatusBadgeClass(
+                                    order.status
+                                  )}`}
+                                >
+                                  {order.status}
+                                </span>
+                                <p className="text-xs text-gray-400 mt-1">
                                   {new Date(order.createAt).toLocaleString()}
                                 </p>
                               </div>

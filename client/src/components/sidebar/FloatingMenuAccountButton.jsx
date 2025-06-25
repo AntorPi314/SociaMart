@@ -76,7 +76,7 @@ export default function FloatingMenuAccountButton() {
       {openMenu && (
         <div
           id="myOrdersOption"
-          className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-40 py-2 z-10"
+          className="absolute left-[110%] bottom-0 bg-[#06142E] text-white rounded-md shadow-lg w-45 py-2 z-10"
         >
           {user?.isShop ? (
             <MenuItem

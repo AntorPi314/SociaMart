@@ -18,7 +18,7 @@ export default function EditSettings({ onClose }) {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("http://localhost:3000/profile/info", {
+        const res = await axios.get("https://sociamart.onrender.com/profile/info", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data?.success) {
@@ -44,7 +44,7 @@ export default function EditSettings({ onClose }) {
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.put("http://localhost:3000/profile/update", form, {
+      const res = await axios.put("https://sociamart.onrender.com/profile/update", form, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data?.success) {

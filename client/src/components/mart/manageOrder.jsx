@@ -1,4 +1,3 @@
-// src/components/mart/manageOrder.jsx
 import { useEffect, useState, useRef } from "react";
 import { X } from "lucide-react";
 import axios from "axios";
@@ -17,7 +16,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
 
   const searchTimeout = useRef(null);
 
-  // Fetch orders on open or shopId change (non-delivered only)
   useEffect(() => {
     if (!open || !shopId) return;
 
@@ -25,15 +23,19 @@ export default function ManageOrder({ open, onClose, shopId }) {
       setLoading(true);
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get(`http://localhost:3000/manage-orders/${shopId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `https://sociamart.onrender.com/manage-orders/${shopId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
         if (res.data?.success) {
           setOrders(res.data.orders);
           setFilteredOrders(res.data.orders);
         } else {
-          setToast({ message: res.data.message || "Failed to load orders", type: "error" });
+          setToast({
+            message: res.data.message || "Failed to load orders",
+            type: "error",
+          });
           setOrders([]);
           setFilteredOrders([]);
         }
@@ -50,7 +52,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
     fetchOrders();
   }, [open, shopId]);
 
-  // Search handler with debounce
   useEffect(() => {
     if (!shopId) return;
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
@@ -59,21 +60,17 @@ export default function ManageOrder({ open, onClose, shopId }) {
       const trimmed = searchTerm.trim();
 
       if (!trimmed) {
-        // If search empty, show normal orders (non-delivered)
         setFilteredOrders(orders);
         return;
       }
 
-      // If search looks like order ID (basic check: length >= 6)
       if (trimmed.length >= 6) {
         setLoading(true);
         const token = localStorage.getItem("token");
         try {
           const res = await axios.get(
-            `http://localhost:3000/manage-orders/${shopId}/search-order/${trimmed}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
+            `https://sociamart.onrender.com/manage-orders/${shopId}/search-order/${trimmed}`,
+            { headers: { Authorization: `Bearer ${token}` } }
           );
 
           if (res.data?.success && res.data.order) {
@@ -90,7 +87,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
           setLoading(false);
         }
       } else {
-        // If too short search, fallback to client-side filter for existing orders
         const lowerSearch = trimmed.toLowerCase();
         setFilteredOrders(
           orders.filter((order) =>
@@ -103,7 +99,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
     return () => clearTimeout(searchTimeout.current);
   }, [searchTerm, orders, shopId]);
 
-  // Handle status update submit
   const handleStatusUpdate = async () => {
     if (!editingOrder || !newStatus) return;
 
@@ -111,14 +106,9 @@ export default function ManageOrder({ open, onClose, shopId }) {
 
     try {
       const res = await axios.patch(
-        `http://localhost:3000/manage-orders/${shopId}/update-status`,
-        {
-          orderId: editingOrder._id,
-          status: newStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `https://sociamart.onrender.com/update-order-status/${shopId}/${editingOrder._id}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data?.success) {
@@ -139,12 +129,21 @@ export default function ManageOrder({ open, onClose, shopId }) {
         setEditingOrder(null);
         setNewStatus("");
       } else {
-        setToast({ message: res.data.message || "Failed to update status", type: "error" });
+        setToast({
+          message: res.data.message || "Failed to update status",
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
       setToast({ message: "Error updating status", type: "error" });
     }
+  };
+
+  const getStatusStyle = (status) => {
+    if (status === "Delivered") return "bg-green-600 text-white";
+    if (status === "Cancel") return "bg-red-600 text-white";
+    return "bg-gray-600 text-white";
   };
 
   if (!open) return null;
@@ -169,7 +168,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
 
           <h2 className="text-xl font-bold mb-4 text-center">Manage Orders</h2>
 
-          {/* Search box */}
           <input
             type="text"
             placeholder="Search by Order ID"
@@ -200,24 +198,15 @@ export default function ManageOrder({ open, onClose, shopId }) {
                       <p className="text-gray-600">
                         Quantity: {order.quantity}
                       </p>
-                      <p className="text-gray-600">
-                        Price: ৳{order.price}
-                      </p>
-                      <p className="text-gray-600">
-                        Name: {order.name}
-                      </p>
-                      <p className="text-gray-600">
-                        Phone: {order.phone}
-                      </p>
-                      <p className="text-gray-600">
-                        Address: {order.address}
-                      </p>
+                      <p className="text-gray-600">Price: ৳{order.price}</p>
+                      <p className="text-gray-600">Name: {order.name}</p>
+                      <p className="text-gray-600">Phone: {order.phone}</p>
+                      <p className="text-gray-600">Address: {order.address}</p>
                       <p className="text-gray-500 text-sm">
                         Order ID: {order._id}
                       </p>
                       <p className="text-gray-500 text-sm">
-                        Create at:{" "}
-                        {new Date(order.createAt).toLocaleString()}
+                        Create at: {new Date(order.createAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -228,10 +217,11 @@ export default function ManageOrder({ open, onClose, shopId }) {
                         setEditingOrder(order);
                         setNewStatus(order.status);
                       }}
-                      className="text-blue-700 font-semibold hover:underline"
-                      aria-label={`Change status for order ${order._id}`}
+                      className={`text-xs px-3 py-1 rounded-full font-semibold ${getStatusStyle(
+                        order.status
+                      )}`}
                     >
-                      Status: {order.status}
+                      {order.status}
                     </button>
                   </div>
                 </div>
@@ -239,7 +229,6 @@ export default function ManageOrder({ open, onClose, shopId }) {
             </div>
           )}
 
-          {/* Status edit dialog */}
           {editingOrder && (
             <div
               className="fixed inset-0 bg-black/30 flex items-center justify-center z-60"
