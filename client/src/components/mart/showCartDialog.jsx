@@ -163,139 +163,155 @@ export default function ShowCartDialog({ open, onClose }) {
 
   if (!open) return null;
 
-  return (
-    <>
+return (
+  <>
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 bg-black/50 p-1.5 z-50 flex items-center justify-center"
-        onClick={onClose}
+        className="relative bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-lg p-4 sm:p-6"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          className="bg-white p-6 max-h-[90vh] overflow-y-auto rounded-2xl w-full max-w-5xl relative"
-          onClick={(e) => e.stopPropagation()}
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-100 transition"
+          aria-label="Close cart dialog"
         >
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 bg-white p-2 rounded-full shadow hover:bg-gray-100 transition"
-            aria-label="Close cart dialog"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <X className="w-5 h-5" />
+        </button>
 
-          <h2 className="text-2xl font-bold mb-6 text-center select-none">Your Cart</h2>
+        {/* Title */}
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center select-none">
+          Your Cart
+        </h2>
 
-          {loading ? (
-            <p className="text-center text-gray-500">Loading...</p>
-          ) : Object.keys(cartData).length === 0 ? (
-            <p className="text-center text-gray-500">Your cart is empty.</p>
-          ) : (
-            <>
-              <div className="space-y-12">
-                {Object.entries(cartData).map(([storeId, { storeInfo, products }]) => (
-                  <div key={storeId}>
-                    <a
-                      href={`/${storeInfo?.URL || storeInfo?.name}`}
-                      className="flex items-center gap-3 mb-6 px-6 py-3 bg-gray-100 rounded-xl hover:underline"
-                    >
-                      <img
-                        src={storeInfo?.profilePIC || "/assets/bx_store.svg"}
-                        alt={storeInfo?.name || "Shop"}
-                        className="w-8 h-8 rounded-full"
-                      />
-                      <span className="font-semibold text-gray-800 text-lg">
-                        {storeInfo?.name || "Shop"}
-                      </span>
-                    </a>
+        {loading ? (
+          <p className="text-center text-gray-500">Loading...</p>
+        ) : Object.keys(cartData).length === 0 ? (
+          <p className="text-center text-gray-500">Your cart is empty.</p>
+        ) : (
+          <>
+            <div className="space-y-12">
+              {Object.entries(cartData).map(([storeId, { storeInfo, products }]) => (
+                <div key={storeId}>
+                  <a
+                    href={`/${storeInfo?.URL || storeInfo?.name}`}
+                    className="flex items-center gap-3 mb-6 px-4 py-3 bg-gray-100 rounded-xl hover:underline"
+                  >
+                    <img
+                      src={storeInfo?.profilePIC || "/assets/bx_store.svg"}
+                      alt={storeInfo?.name || "Shop"}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="font-semibold text-gray-800 text-lg">
+                      {storeInfo?.name || "Shop"}
+                    </span>
+                  </a>
 
-                    <div className="space-y-4">
-                      {products.map((product) => {
-                        const key = `${storeId}_${product._id}`;
-                        const quantity = quantities[key] || 1;
+                  <div className="space-y-4">
+                    {products.map((product) => {
+                      const key = `${storeId}_${product._id}`;
+                      const quantity = quantities[key] || 1;
 
-                        return (
-                          <div
-                            key={product._id}
-                            className={`flex items-center gap-4 rounded-xl p-4 drop-shadow-sm transition-all ${selected[key] ? "bg-green-100 border-green-200" : "bg-white"}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={!!selected[key]}
-                              onChange={() => toggleSelect(storeId, product._id)}
-                              className="accent-green-600 w-5 h-5"
-                            />
-                            <img
-                              src={product.images?.[0] || "/assets/default.jpg"}
-                              alt={product.title}
-                              className="w-24 h-24 object-cover rounded-lg border cursor-pointer"
-                              onClick={() =>
-                                setProductDialog({
-                                  id: product._id,
-                                  name: product.title,
-                                  price: product.price,
-                                  priceOld: product.price_old,
-                                  rating: product.rating,
-                                  left: product.left,
-                                  images: product.images,
-                                  description: product.des,
-                                })
-                              }
-                            />
-                            <div className="flex-grow">
-                              <h3 className="font-semibold text-base mb-1 text-gray-800 max-w-[140px] sm:max-w-full truncate">
-                                {product.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 mb-2">
-                                ৳ {product.price} × {quantity} = <span className="font-medium text-gray-800">৳ {product.price * quantity}</span>
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded"
-                                  onClick={() => updateQuantity(storeId, product._id, -1)}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="w-8 text-center font-medium">{quantity}</span>
-                                <button
-                                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded"
-                                  onClick={() => updateQuantity(storeId, product._id, 1)}
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
-                              </div>
+                      return (
+                        <div
+                          key={product._id}
+                          className={`flex items-center gap-3 sm:gap-4 rounded-xl p-3 sm:p-4 drop-shadow-sm transition-all flex-wrap sm:flex-nowrap ${selected[key] ? "bg-green-100 border-green-200" : "bg-white"}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!selected[key]}
+                            onChange={() => toggleSelect(storeId, product._id)}
+                            className="accent-green-600 w-5 h-5"
+                          />
+                          <img
+                            src={product.images?.[0] || "/assets/default.jpg"}
+                            alt={product.title}
+                            className="w-24 h-24 object-cover rounded-lg border cursor-pointer"
+                            onClick={() =>
+                              setProductDialog({
+                                id: product._id,
+                                name: product.title,
+                                price: product.price,
+                                priceOld: product.price_old,
+                                rating: product.rating,
+                                left: product.left,
+                                images: product.images,
+                                description: product.des,
+                              })
+                            }
+                          />
+                          <div className="flex-grow min-w-[150px]">
+                            <h3 className="font-semibold text-base mb-1 text-gray-800 max-w-[140px] sm:max-w-full truncate">
+                              {product.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-2">
+                              ৳ {product.price} × {quantity} ={" "}
+                              <span className="font-medium text-gray-800">
+                                ৳ {product.price * quantity}
+                              </span>
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <button
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded"
+                                onClick={() => updateQuantity(storeId, product._id, -1)}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </button>
+                              <span className="w-8 text-center font-medium">{quantity}</span>
+                              <button
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded"
+                                onClick={() => updateQuantity(storeId, product._id, 1)}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </button>
                             </div>
-                            <button
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => removeFromCart(storeId, product._id)}
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
                           </div>
-                        );
-                      })}
-                    </div>
+                          <button
+                            className="text-red-600 hover:text-red-700 ml-auto"
+                            onClick={() => removeFromCart(storeId, product._id)}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
-              <div className="text-center mt-8">
-                <p className="text-xl font-semibold mb-4 text-gray-800">
-                  Total: <span className="text-green-600">৳ {totalSelectedPrice}</span>
-                </p>
-                <button
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl text-lg font-medium shadow-md transition-all"
-                  onClick={proceedToOrder}
-                  disabled={submitting}
-                >
-                  {submitting ? "Processing..." : <><ShoppingBag className="inline-block mr-2" />Place Order</>}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+                </div>
+              ))}
+            </div>
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      {productDialog && (
-        <ProductDialog {...productDialog} onClose={() => setProductDialog(null)} />
-      )}
-    </>
-  );
+            <div className="text-center mt-8">
+              <p className="text-xl font-semibold mb-4 text-gray-800">
+                Total: <span className="text-green-600">৳ {totalSelectedPrice}</span>
+              </p>
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl text-lg font-medium shadow-md transition-all"
+                onClick={proceedToOrder}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  "Processing..."
+                ) : (
+                  <>
+                    <ShoppingBag className="inline-block mr-2" />
+                    Place Order
+                  </>
+                )}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+
+    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+    {productDialog && (
+      <ProductDialog {...productDialog} onClose={() => setProductDialog(null)} />
+    )}
+  </>
+);
+
 }
