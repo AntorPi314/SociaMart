@@ -240,7 +240,7 @@ export default function ShowCartDialog({ open, onClose }) {
                               }
                             />
                             <div className="flex-grow">
-                              <h3 className="font-semibold truncate text-base mb-1 text-gray-800">
+                              <h3 className="font-semibold text-base mb-1 text-gray-800 max-w-[140px] sm:max-w-full truncate">
                                 {product.title}
                               </h3>
                               <p className="text-sm text-gray-600 mb-2">
