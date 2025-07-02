@@ -14,7 +14,7 @@ router.get("/posts/:storeURL", optionalAuthenticate, async (req, res) => {
 
     // Find the store by URL
     const storeUser = await usersCollection.findOne({
-      URL: storeURL,
+      URL: { $regex: ^${storeURL}$, $options: "i" },
       isShop: true,
     });
 

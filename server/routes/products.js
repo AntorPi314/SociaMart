@@ -13,7 +13,7 @@ router.get("/products/:storeURL", optionalAuthenticate, async (req, res) => {
     const usersCollection = userDB.collection("users");
 
     const storeUser = await usersCollection.findOne({
-      URL: storeURL,
+      URL: { $regex: ^${storeURL}$, $options: "i" },
       isShop: true,
     });
 
