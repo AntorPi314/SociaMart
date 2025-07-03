@@ -1,6 +1,12 @@
 # SociaMart
 
-https://socia-mart.vercel.app/Best
+https://socia-mart.vercel.app/Easy
+
+https://socia-mart.vercel.app/Laptop
+
+https://socia-mart.vercel.app/Bata
+
+https://socia-mart.vercel.app/MangoBD
  
 - [Figma Design](https://www.figma.com/design/CCpOfJ8bBb1QnOpGBerVNJ/SociaMart?node-id=0-1&t=nWqCfV0oSfeIi49E-1)
  
