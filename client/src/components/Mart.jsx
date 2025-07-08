@@ -1,7 +1,7 @@
 // src/components/Mart.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, Plus } from "lucide-react";
 import Vector from "../assets/bx_store.svg";
 import ProductGlobal from "./mart/ProductGlobal";
 import CrudProductDialog from "./mart/createProductDialog";
@@ -113,10 +113,12 @@ export default function Mart({ storeName }) {
         {/* TopHeader2: either search/sort or error message */}
         {storeInfo !== null ? (
           <TopHeader2
+            storeInfo={storeInfo}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             sortOption={sortOption}
             setSortOption={setSortOption}
+            setShowCrud={setShowCrud}
           />
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-red-600 font-semibold">
@@ -158,16 +160,22 @@ function formatFollowers(num) {
   return num.toString();
 }
 
-function TopHeader1({ storeInfo, isFollowing, onFollowClick, isLoggedIn, setShowCrud }) {
+function TopHeader1({
+  storeInfo,
+  isFollowing,
+  onFollowClick,
+  isLoggedIn,
+  setShowCrud,
+}) {
   const name = storeInfo?.name || "Best Buy Store";
   const profilePIC = storeInfo?.profilePIC || Vector;
   const followers = storeInfo?.followers || 0;
   const isVerified = storeInfo?.verified || false;
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
 
-console.log("User ID:", userId);
-console.log("Store ID:", storeInfo?._id);
-console.log("Match:", userId === storeInfo?._id);
+  console.log("User ID:", userId);
+  console.log("Store ID:", storeInfo?._id);
+  console.log("Match:", userId === storeInfo?._id);
 
   return (
     <div className="flex items-center gap-4 mb-4 px-4">
@@ -207,8 +215,17 @@ console.log("Match:", userId === storeInfo?._id);
   );
 }
 
-function TopHeader2({ searchTerm, setSearchTerm, sortOption, setSortOption }) {
+function TopHeader2({
+  storeInfo,
+  searchTerm,
+  setSearchTerm,
+  sortOption,
+  setSortOption,
+  setShowCrud,
+}) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const userId = JSON.parse(localStorage.getItem("user"))?._id;
+  const isOwner = userId === storeInfo?._id;
 
   const sortOptions = [
     { label: "Price (High to Low)", value: "price_desc" },
@@ -221,7 +238,21 @@ function TopHeader2({ searchTerm, setSearchTerm, sortOption, setSortOption }) {
 
   return (
     <div className="flex items-center gap-4 pr-4 bg-white relative">
-      <div className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 w-40 sm:w-52 md:w-60 lg:w-76 bg-white shadow-sm">
+      {/* Add Product Button */}
+      {isOwner && (
+        <button
+          onClick={() => setShowCrud(true)}
+          className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Search Box */}
+      <div
+        id="searchBox"
+        className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 w-40 sm:w-52 md:w-60 lg:w-76 bg-white shadow-sm"
+      >
         <Search className="w-5 h-5 text-[#C9A9A6]" />
         <input
           type="text"
@@ -232,6 +263,7 @@ function TopHeader2({ searchTerm, setSearchTerm, sortOption, setSortOption }) {
         />
       </div>
 
+      {/* Sort Dropdown */}
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
