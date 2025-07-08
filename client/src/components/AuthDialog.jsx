@@ -44,7 +44,7 @@ export default function AuthDialog({ open, onClose }) {
 
     try {
       const { data } = await axios.post(
-        `https://sociamart.onrender.com${endpoint}`,
+        `http://localhost:3000${endpoint}`,
         form
       );
 
@@ -70,12 +70,18 @@ export default function AuthDialog({ open, onClose }) {
               _id: data.user._id,
               email: data.user.email,
               isShop: data.user.isShop,
+              URL: data.user.URL,
             })
           );
 
           // Close modal and reload current page
-          onClose();
-          window.location.reload();
+          const currentURL = window.location.href;
+          if (data.user.isShop) {
+            const reloadURL = `${window.location.origin}/${data.user.URL}`;
+            window.location.href = reloadURL;
+          } else {
+            window.location.href = currentURL; 
+          }
         }
       } else {
         showToast(data.message, "error");
@@ -109,7 +115,7 @@ export default function AuthDialog({ open, onClose }) {
                 <input
                   type="text"
                   name="name"
-                  placeholder={form.isShop ? "Your Shop Name" : "Your Name"}
+                  placeholder={form.isShop ? "Your Store Name" : "Your Name"}
                   className="border p-2 rounded text-black placeholder-gray-500"
                   value={form.name}
                   onChange={handleChange}
@@ -121,7 +127,7 @@ export default function AuthDialog({ open, onClose }) {
                     <input
                       type="text"
                       name="URL"
-                      placeholder="your-shop-url"
+                      placeholder="your-store-url"
                       className="flex-1 outline-none text-black ml-1"
                       value={form.URL}
                       onChange={handleChange}
@@ -146,7 +152,7 @@ export default function AuthDialog({ open, onClose }) {
                       checked={form.isShop}
                       onChange={() => handleRadioChange(true)}
                     />
-                    Shop
+                    Store
                   </label>
                 </div>
               </>

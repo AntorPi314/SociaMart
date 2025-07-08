@@ -118,7 +118,7 @@ export default function EditSettings({ onClose }) {
 
         {isShop && (
           <p className="text-sm text-gray-700 mt-4">
-            🏬 My Shop:{" "}
+            🏬 My Store:{" "}
             <a
               href={`${currentURL}/${form.URL}`}
               className="text-green-600 underline"
