@@ -29,12 +29,12 @@ router.get("/posts/:storeURL", optionalAuthenticate, async (req, res) => {
 
     const rawPosts = await postCollection.find().toArray();
 
-    // Get all unique post owner_ids
+ 
     const uniqueOwnerIds = [...new Set(rawPosts.map(p => p.owner_id?.toString()))]
       .filter(Boolean)
       .map(id => new ObjectId(id));
 
-    // Get owner info in one query
+   
     const owners = await usersCollection.find({ _id: { $in: uniqueOwnerIds } }).toArray();
 
     const ownerMap = {};
@@ -59,6 +59,7 @@ router.get("/posts/:storeURL", optionalAuthenticate, async (req, res) => {
         createAt: post.createAt,
         likeCount: post.likeCount || 0,
         text: post.text || "",
+        post_image_link: post.post_image_link || "",
         owner_id: post.owner_id,
         owner_name: ownerMap[postOwnerId]?.name || "Unknown",
         owner_profilePIC: ownerMap[postOwnerId]?.profilePIC || "/assets/avatar.svg",

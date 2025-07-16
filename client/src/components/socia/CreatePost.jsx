@@ -5,6 +5,8 @@ import { X } from "lucide-react";
 
 export default function CreatePost({ open, onClose, storeName }) {
   const [text, setText] = useState("");
+  const [postImage, setPostImage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   const showToast = (message, type = "success") => {
@@ -27,23 +29,28 @@ export default function CreatePost({ open, onClose, storeName }) {
     }
 
     try {
+      setLoading(true);
+
       const res = await axios.post(
         `https://sociamart.onrender.com/post/${storeName}`,
-        { text },
+        { text, post_image_link: postImage.trim() || undefined },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.success) {
         showToast("Post created successfully", "success");
         setText("");
-        onClose(); // Close modal
-        window.location.reload(); // Refresh post list
+        setPostImage("");
+        onClose();
+        window.location.reload(); // or better: trigger parent refresh
       } else {
         showToast(res.data.message || "Failed to post", "error");
       }
     } catch (err) {
       const msg = err?.response?.data?.message || "Server error";
       showToast(msg, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,7 +66,7 @@ export default function CreatePost({ open, onClose, storeName }) {
           className="bg-white p-6 rounded-xl w-100 text-black relative"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button like ProductDialog */}
+          {/* Close Button */}
           <button
             onClick={onClose}
             className="absolute -top-4 -right-4 bg-white text-gray-700 hover:text-red-500 rounded-full p-2 shadow-md transition duration-200 z-10"
@@ -78,11 +85,22 @@ export default function CreatePost({ open, onClose, storeName }) {
               onChange={(e) => setText(e.target.value)}
             />
 
+            <input
+              type="url"
+              placeholder="Optional Image URL"
+              className="border p-2 rounded text-black placeholder-gray-500"
+              value={postImage}
+              onChange={(e) => setPostImage(e.target.value)}
+            />
+
             <button
               type="submit"
-              className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
+              disabled={loading}
+              className={`bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Post
+              {loading ? "Posting..." : "Post"}
             </button>
           </form>
         </div>

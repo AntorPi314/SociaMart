@@ -29,6 +29,7 @@ export default function CustomPost({
   likeCount: initialLikeCount,
   timeAgo,
   text,
+  post_image_link,
   likedProp,
   shopId,
   postId,
@@ -162,6 +163,14 @@ export default function CustomPost({
         <p className="text-stone-800 text-sm leading-5 whitespace-pre-line break-words">
           {linkify(text)}
         </p>
+
+        {post_image_link && (
+          <img
+            src={post_image_link}
+            alt="Post image"
+            className="w-full rounded-lg shadow"
+          />
+        )}
       </div>
 
       {showConfirm && (

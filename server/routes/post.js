@@ -8,9 +8,8 @@ const authenticateToken = require("../middleware/authMiddleware");
 // POST: Create a new post
 router.post("/post/:storeURL", authenticateToken, async (req, res) => {
   try {
-    // console.log("DEBUG: req.body =", req.body);
     const storeURL = req.params.storeURL;
-    const { text } = req.body;
+    const { text, post_image_link } = req.body;
 
     if (!text || typeof text !== "string") {
       return res.status(400).json({ success: false, message: "Text is required" });
@@ -38,6 +37,7 @@ router.post("/post/:storeURL", authenticateToken, async (req, res) => {
       likeCount: 0,
       likedUsers: [],
       createAt: new Date(),
+      ...(post_image_link && { post_image_link }),
     };
 
     const result = await postCollection.insertOne(newPost);

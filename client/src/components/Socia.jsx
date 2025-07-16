@@ -63,7 +63,7 @@ export default function Socia({ storeName }) {
     const past = new Date(dateString);
     const diff = (now - past) / 1000; // in seconds
 
-    if (diff < 60) return `1m`; // Always show at least "1m", never seconds
+    if (diff < 60) return `1m`; 
     if (diff < 3600) return `${Math.floor(diff / 60)}m`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
 
@@ -107,6 +107,8 @@ export default function Socia({ storeName }) {
           posts.map((post) => {
             const timeAgo = getTimeAgo(post.createAt);
 
+          console.log(post);
+
             return (
               <CustomPost
                 key={post._id}
@@ -116,6 +118,7 @@ export default function Socia({ storeName }) {
                 likeCount={post.likeCount || 0}
                 timeAgo={timeAgo}
                 text={post.text}
+                post_image_link={post.post_image_link}
                 likedProp={post.liked}
                 shopId={storeId}
                 postId={post._id}
