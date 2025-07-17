@@ -21,7 +21,7 @@ export default function FloatingMenuAccountButton() {
 
     if (token) {
       axios
-        .get("https://sociamart.onrender.com/profile/pic", {
+        .get("http://localhost:3000/profile/pic", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {

@@ -18,7 +18,7 @@ export default function DeleteProductDialog({ open, onClose, storeId, product })
     const token = localStorage.getItem("token");
     try {
       const res = await axios.delete(
-        `https://sociamart.onrender.com/deleteProduct/${storeId}/${product._id}`,
+        `http://localhost:3000/deleteProduct/${storeId}/${product._id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {

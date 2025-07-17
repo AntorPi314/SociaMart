@@ -25,7 +25,7 @@ export default function Mart({ storeName }) {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const res = await axios.get(
-          `https://sociamart.onrender.com/products/${storeName}`,
+          `http://localhost:3000/products/${storeName}`,
           { headers }
         );
         if (res.data.success) {
@@ -52,8 +52,8 @@ export default function Mart({ storeName }) {
       if (!token || !storeInfo?._id) return;
 
       const endpoint = isFollowing
-        ? `https://sociamart.onrender.com/stores/unfollow/${storeInfo._id}`
-        : `https://sociamart.onrender.com/stores/follow/${storeInfo._id}`;
+        ? `http://localhost:3000/stores/unfollow/${storeInfo._id}`
+        : `http://localhost:3000/stores/follow/${storeInfo._id}`;
 
       const res = await axios.post(
         endpoint,

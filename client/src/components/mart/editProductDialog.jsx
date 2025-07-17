@@ -36,7 +36,7 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.put(
-        `https://sociamart.onrender.com/editProduct/${storeId}/${product._id}`,
+        `http://localhost:3000/editProduct/${storeId}/${product._id}`,
         { title, des, price: parseFloat(price), left: parseInt(left) || 0, images },
         { headers: { Authorization: `Bearer ${token}` } }
       );

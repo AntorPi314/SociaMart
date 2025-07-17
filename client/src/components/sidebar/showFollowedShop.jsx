@@ -14,7 +14,7 @@ export default function ShowFollowedShop({ open, onClose }) {
     const fetchFollowedStores = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("https://sociamart.onrender.com/stores/followed/list", {
+        const res = await axios.get("http://localhost:3000/stores/followed/list", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {
