@@ -1,4 +1,5 @@
 // src/components/Sidebar.jsx
+import { useNavigate, useLocation  } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   House,
@@ -86,9 +87,15 @@ export default function Sidebar() {
           <FloatingMenuAccountButton />
         </div>
 
-        <ShowWishlistDialog open={wishlistOpen} onClose={() => setWishlistOpen(false)} />
+        <ShowWishlistDialog
+          open={wishlistOpen}
+          onClose={() => setWishlistOpen(false)}
+        />
         <ShowCartDialog open={cartOpen} onClose={() => setCartOpen(false)} />
-        <ShowFollowedShop open={followedShopOpen} onClose={() => setFollowedShopOpen(false)} />
+        <ShowFollowedShop
+          open={followedShopOpen}
+          onClose={() => setFollowedShopOpen(false)}
+        />
       </div>
 
       {toast && (
@@ -103,10 +110,20 @@ export default function Sidebar() {
 }
 
 function BarButton1() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const handleClick = () => {
+    if (location.pathname === "/") {
+      window.location.reload();
+    } else {
+      navigate("/");
+    }
+  };
   return (
     <div
       id="home"
       className="relative w-auto h-12 flex items-center justify-center cursor-pointer"
+      onClick={handleClick}
     >
       <House color="white" />
     </div>

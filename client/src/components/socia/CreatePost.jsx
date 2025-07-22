@@ -42,7 +42,7 @@ export default function CreatePost({ open, onClose, storeName }) {
         setText("");
         setPostImage("");
         onClose();
-        window.location.reload(); // or better: trigger parent refresh
+        window.location.reload(); 
       } else {
         showToast(res.data.message || "Failed to post", "error");
       }
