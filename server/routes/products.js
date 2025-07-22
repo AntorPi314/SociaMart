@@ -9,6 +9,7 @@ router.get("/products/:storeURL", optionalAuthenticate, async (req, res) => {
   try {
     const storeURL = req.params.storeURL;
 
+
     const userDB = getUserDb();
     const usersCollection = userDB.collection("users");
 

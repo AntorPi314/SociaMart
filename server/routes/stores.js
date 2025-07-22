@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { getUserDb } = require("../db");
 const authenticateToken = require("../middleware/authMiddleware");
-const { ObjectId } = require("mongodb");  // <-- Import ObjectId properly
+const { ObjectId } = require("mongodb");  
 
 const userDB = getUserDb();
 
