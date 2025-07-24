@@ -1,9 +1,8 @@
-// src/components/MartHome.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Filter, Search, Plus } from "lucide-react";
 import Vector from "../assets/bx_store.svg";
-import ProductGlobal from "./mart/ProductGlobal";
+import ProductGlobalHome from "./mart/ProductGlobalHome";
 import CrudProductDialog from "./mart/createProductDialog";
 
 export default function Mart() {
@@ -11,47 +10,63 @@ export default function Mart() {
   const [sortOption, setSortOption] = useState("");
   const [products, setProducts] = useState([]);
   const [showCrud, setShowCrud] = useState(false);
-  const [loading, setLoading] = useState(true); // <-- new loading state
+  const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true); // start loading
-      try {
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await axios.get("http://localhost:3000/home/products", {
-          headers,
-        });
-        if (res.data.success) {
-          const allProducts = res.data.stores.flatMap(
-            (store) => store.products || []
-          );
-          setProducts(allProducts);
-        } else {
-          setProducts([]);
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false); // done loading
-      }
-    }
-
     fetchProducts();
-  }, [token]);
+  }, []);
 
-  // Also update handleSearch to toggle loading if you want:
-  const handleSearch = async () => {
+  const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:3000/home/search`, {
+      const res = await axios.get("http://localhost:3000/home/products", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (res.data.success) {
+        const allProducts = res.data.stores.flatMap((store) =>
+          (store.products || []).map((product) => ({
+            ...product,
+            shopName: store.shop?.name,
+            shopId: store.shop?._id,
+            shopURL: store.shop?.URL,
+            shopPIC: store.shop?.profilePIC,
+            verified: store.shop?.verified,
+          }))
+        );
+        setProducts(allProducts);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
+    setLoading(true);
+    try {
+      const res = await axios.get("http://localhost:3000/home/search", {
         params: { q: searchTerm },
       });
-      if (res.data?.success && res.data?.results) {
-        const allProducts = res.data.results.flatMap(
-          (store) => store.products || []
+
+      if (res.data.success && res.data.results) {
+        const allProducts = res.data.results.flatMap((store) =>
+          (store.products || []).map((product) => ({
+            ...product,
+            shopName: store.shop?.name,
+            shopId: store.shop?._id,
+            shopURL: store.shop?.URL,
+            shopPIC: store.shop?.profilePIC,
+            verified: store.shop?.verified,
+          }))
         );
         setProducts(allProducts);
       } else {
@@ -65,7 +80,7 @@ export default function Mart() {
     }
   };
 
-  const filtered = [...products].sort((a, b) => {
+  const filteredProducts = [...products].sort((a, b) => {
     switch (sortOption) {
       case "price_desc":
         return b.price - a.price;
@@ -86,20 +101,20 @@ export default function Mart() {
 
   return (
     <div className="flex flex-col flex-1 ml-1.5 rounded-[12px] overflow-hidden bg-white">
-      {/* Static header for SociaMart */}
       <div className="h-[80px] flex justify-between items-center px-4">
         <TopHeader1
-          storeInfo={{ name: "SociaMart", profilePIC: null, _id: "home" }}
+          storeInfo={{ name: "SociaMart", profilePIC: null, _id: "home", verified: true }}
+          userId={user?._id}
           setShowCrud={setShowCrud}
         />
         <TopHeader2
-          storeInfo={{ _id: "home" }}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           sortOption={sortOption}
           setSortOption={setSortOption}
-          setShowCrud={setShowCrud}
           handleSearch={handleSearch}
+          userId={user?._id}
+          setShowCrud={setShowCrud}
         />
       </div>
 
@@ -108,8 +123,8 @@ export default function Mart() {
           <div className="flex items-center justify-center h-full text-gray-500 font-semibold text-lg">
             Loading products...
           </div>
-        ) : filtered.length > 0 ? (
-          <MartBody filtered={filtered} storeId={"home"} />
+        ) : filteredProducts.length > 0 ? (
+          <MartBody filtered={filteredProducts} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500 font-semibold text-lg">
             No products found
@@ -128,16 +143,13 @@ export default function Mart() {
   );
 }
 
-
-function TopHeader1({ storeInfo, setShowCrud }) {
+function TopHeader1({ storeInfo, userId, setShowCrud }) {
   const name = storeInfo?.name || "SociaMart";
   const profilePIC = storeInfo?.profilePIC || Vector;
-  const userId = JSON.parse(localStorage.getItem("user"))?._id;
 
   return (
     <div className="flex items-center gap-4 mb-4 px-4">
       <img
-        id="profilePic_img"
         className="w-14 h-14 rounded-full cursor-pointer"
         src={profilePIC}
         onClick={() => {
@@ -148,7 +160,9 @@ function TopHeader1({ storeInfo, setShowCrud }) {
       <div className="flex flex-col">
         <div className="flex items-center gap-1">
           <h2 className="text-lg font-semibold">{name}</h2>
-          <img className="w-5" src="/assets/verified.svg" alt="verified" />
+          {storeInfo?.verified && (
+            <img className="w-5" src="/assets/verified.svg" alt="verified" />
+          )}
         </div>
         <p className="text-sm text-gray-500">Your Trusted Partner</p>
       </div>
@@ -161,12 +175,11 @@ function TopHeader2({
   setSearchTerm,
   sortOption,
   setSortOption,
-  setShowCrud,
   handleSearch,
+  userId,
+  setShowCrud,
 }) {
-  const userId = JSON.parse(localStorage.getItem("user"))?._id;
-  const isOwner = userId === "home"; // adjust if needed
-
+  const isOwner = userId === "home";
   const sortOptions = [
     { label: "Price (High to Low)", value: "price_desc" },
     { label: "Price (Low to High)", value: "price_asc" },
@@ -176,7 +189,7 @@ function TopHeader2({
     { label: "Name (Z-A)", value: "name_desc" },
   ];
 
-  const [showDropdown, setShowDropdown] = React.useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   return (
     <div className="flex items-center gap-4 pr-4 bg-white relative">
@@ -188,21 +201,15 @@ function TopHeader2({
           <Plus className="w-5 h-5" />
         </button>
       )}
-
       <div className="flex items-center border border-[#d3d3d3] rounded-full px-4 py-2 bg-white shadow-sm w-72">
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           placeholder="Search anything..."
           className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400"
         />
-
         <button
           onClick={handleSearch}
           className="ml-2 text-blue-600 hover:text-blue-800"
@@ -210,7 +217,6 @@ function TopHeader2({
           <Search className="w-5 h-5" />
         </button>
       </div>
-
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
@@ -242,12 +248,12 @@ function TopHeader2({
   );
 }
 
-function MartBody({ filtered, storeId }) {
+function MartBody({ filtered }) {
   return (
     <div className="flex justify-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 max-w-[1400px] w-full px-14">
         {filtered.map((product) => (
-          <ProductGlobal
+          <ProductGlobalHome
             key={product._id}
             id={product._id}
             name={product.title}
@@ -257,10 +263,16 @@ function MartBody({ filtered, storeId }) {
             left={parseInt(product.left)}
             images={product.images}
             description={product.des}
-            hideShop={true}
             wishlist={product.wishlist}
-            storeId={storeId}
+            storeId={product.shopId}
             productId={product._id}
+            shop={{
+              name: product.shopName,
+              _id: product.shopId,
+              profilePIC: product.shopPIC,
+              URL: product.shopURL,
+              verified: product.verified,
+            }}
           />
         ))}
       </div>
