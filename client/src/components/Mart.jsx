@@ -98,29 +98,32 @@ export default function Mart({ storeName }) {
 
   return (
     <div className="flex flex-col flex-1 ml-1.5 rounded-[12px] overflow-hidden bg-white">
-      <div className="h-[80px] flex justify-between items-center px-4">
-        {/* Hide TopHeader1 if store not found */}
+      <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 px-0 py-3 bg-white">
         {storeInfo !== null && (
-          <TopHeader1
-            storeInfo={storeInfo}
-            isFollowing={isFollowing}
-            onFollowClick={handleFollowToggle}
-            isLoggedIn={isLoggedIn}
-            setShowCrud={setShowCrud}
-          />
+          <>
+            <TopHeader1
+              storeInfo={storeInfo}
+              isFollowing={isFollowing}
+              onFollowClick={handleFollowToggle}
+              isLoggedIn={isLoggedIn}
+              setShowCrud={setShowCrud}
+            />
+
+            {/* Center TopHeader2 on mobile, right-align on desktop */}
+            <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+              <TopHeader2
+                storeInfo={storeInfo}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                sortOption={sortOption}
+                setSortOption={setSortOption}
+                setShowCrud={setShowCrud}
+              />
+            </div>
+          </>
         )}
 
-        {/* TopHeader2: either search/sort or error message */}
-        {storeInfo !== null ? (
-          <TopHeader2
-            storeInfo={storeInfo}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-            setShowCrud={setShowCrud}
-          />
-        ) : (
+        {storeInfo === null && (
           <div className="flex flex-1 flex-col items-center justify-center gap-1 text-red-600 font-semibold">
             <img src="/assets/error.svg" alt="Error Icon" className="w-8 h-8" />
             <span className="text-lg font-bold">
@@ -178,38 +181,39 @@ function TopHeader1({
   console.log("Match:", userId === storeInfo?._id);
 
   return (
-    <div className="flex items-center gap-4 mb-4 px-4">
-      <img
-        id="profilePic_img"
-        className="w-14 h-14 rounded-full cursor-pointer"
-        src={profilePIC}
-        onClick={() => {
-          if (userId === storeInfo?._id) setShowCrud(true);
-        }}
-        alt="Store"
-      />
-
-      <div className="flex flex-col">
-        <div className="flex items-center gap-1">
-          <h2 className="text-lg font-semibold">{name}</h2>
-          {isVerified && (
-            <img className="w-5" src="/assets/verified.svg" alt="verified" />
-          )}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-0 px-4">
+      <div className="flex items-center gap-3">
+        <img
+          id="profilePic_img"
+          className="w-14 h-14 rounded-full cursor-pointer"
+          src={profilePIC}
+          onClick={() => {
+            if (userId === storeInfo?._id) setShowCrud(true);
+          }}
+          alt="Store"
+        />
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1">
+            <h2 className="text-lg font-semibold">{name}</h2>
+            {isVerified && (
+              <img className="w-5" src="/assets/verified.svg" alt="verified" />
+            )}
+          </div>
+          <p className="text-sm text-gray-500">
+            {formatFollowers(followers)} Followers{" "}
+            {isLoggedIn && (
+              <>
+                ·{" "}
+                <span
+                  onClick={onFollowClick}
+                  className="text-blue-600 font-medium cursor-pointer"
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </span>
+              </>
+            )}
+          </p>
         </div>
-        <p className="text-sm text-gray-500">
-          {formatFollowers(followers)} Followers{" "}
-          {isLoggedIn && (
-            <>
-              ·{" "}
-              <span
-                onClick={onFollowClick}
-                className="text-blue-600 font-medium cursor-pointer"
-              >
-                {isFollowing ? "Following" : "Follow"}
-              </span>
-            </>
-          )}
-        </p>
       </div>
     </div>
   );
@@ -237,8 +241,7 @@ function TopHeader2({
   ];
 
   return (
-    <div className="flex items-center gap-4 pr-4 bg-white relative">
-      {/* Add Product Button */}
+    <div className="flex flex-row items-center justify-end gap-2 sm:gap-4 pr-4 bg-white">
       {isOwner && (
         <button
           onClick={() => setShowCrud(true)}
@@ -248,10 +251,9 @@ function TopHeader2({
         </button>
       )}
 
-      {/* Search Box */}
       <div
         id="searchBox"
-        className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 w-40 sm:w-52 md:w-60 lg:w-76 bg-white shadow-sm"
+        className="relative flex items-center border border-[#E3E3E3] rounded-[16px] px-4 py-2 bg-white shadow-sm w-72"
       >
         <Search className="w-5 h-5 text-[#C9A9A6]" />
         <input
@@ -263,11 +265,10 @@ function TopHeader2({
         />
       </div>
 
-      {/* Sort Dropdown */}
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-1 border border-gray-300 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
+          className="flex items-center justify-center gap-1 border border-gray-300 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
         >
           <Filter className="w-4 h-4 text-gray-600" />
           <span>Sort</span>
@@ -295,26 +296,31 @@ function TopHeader2({
   );
 }
 
+
+
 function MartBody({ filtered, storeId }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-      {filtered.map((product) => (
-        <ProductGlobal
-          key={product._id}
-          id={product._id}
-          name={product.title}
-          price={parseFloat(product.price)}
-          priceOld={parseFloat(product.price_old)}
-          rating={parseFloat(product.rating)}
-          left={parseInt(product.left)}
-          images={product.images}
-          description={product.des}
-          hideShop={true}
-          wishlist={product.wishlist}
-          storeId={storeId}
-          productId={product._id}
-        />
-      ))}
+    <div className="flex justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-screen-xl w-full">
+        {filtered.map((product) => (
+          <ProductGlobal
+            key={product._id}
+            id={product._id}
+            name={product.title}
+            price={parseFloat(product.price)}
+            priceOld={parseFloat(product.price_old)}
+            rating={parseFloat(product.rating)}
+            left={parseInt(product.left)}
+            images={product.images}
+            description={product.des}
+            hideShop={true}
+            wishlist={product.wishlist}
+            storeId={storeId}
+            productId={product._id}
+          />
+        ))}
+      </div>
     </div>
   );
 }
+

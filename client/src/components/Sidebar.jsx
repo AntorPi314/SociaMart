@@ -131,15 +131,22 @@ function BarButton1() {
 }
 
 function BarButton2() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <div
       id="hide-show"
-      className="relative w-auto h-12 flex items-center justify-center cursor-pointer block md:hidden"
+      className={`relative w-auto h-12 flex items-center justify-center cursor-pointer block md:hidden ${
+        isHome ? "opacity-50 pointer-events-none" : ""
+      }`}
+      title={isHome ? "Disabled on homepage" : "Toggle Sidebar"}
     >
       <ArrowLeftRight color="white" />
     </div>
   );
 }
+
 
 function BarButton3() {
   return (

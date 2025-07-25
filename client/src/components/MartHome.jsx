@@ -1,3 +1,4 @@
+// src/components/MartHome.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Filter, Search, Plus } from "lucide-react";
@@ -101,21 +102,28 @@ export default function Mart() {
 
   return (
     <div className="flex flex-col flex-1 ml-1.5 rounded-[12px] overflow-hidden bg-white">
-      <div className="h-[80px] flex justify-between items-center px-4">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-2 px-5 py-2">
         <TopHeader1
-          storeInfo={{ name: "SociaMart", profilePIC: null, _id: "home", verified: true }}
+          storeInfo={{
+            name: "SociaMart",
+            profilePIC: null,
+            _id: "home",
+            verified: true,
+          }}
           userId={user?._id}
           setShowCrud={setShowCrud}
         />
-        <TopHeader2
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          sortOption={sortOption}
-          setSortOption={setSortOption}
-          handleSearch={handleSearch}
-          userId={user?._id}
-          setShowCrud={setShowCrud}
-        />
+        <div className="w-full md:w-auto flex justify-center md:justify-end">
+          <TopHeader2
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            sortOption={sortOption}
+            setSortOption={setSortOption}
+            handleSearch={handleSearch}
+            userId={user?._id}
+            setShowCrud={setShowCrud}
+          />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-1 bg-[#EDF0F9] rounded-2xl border-8 border-[#EDF0F9]">
@@ -148,7 +156,7 @@ function TopHeader1({ storeInfo, userId, setShowCrud }) {
   const profilePIC = storeInfo?.profilePIC || Vector;
 
   return (
-    <div className="flex items-center gap-4 mb-4 px-4">
+    <div className="flex items-center gap-0 mb-0 px-0">
       <img
         className="w-14 h-14 rounded-full cursor-pointer"
         src={profilePIC}
@@ -178,6 +186,7 @@ function TopHeader2({
   handleSearch,
   userId,
   setShowCrud,
+  className = "",
 }) {
   const isOwner = userId === "home";
   const sortOptions = [
@@ -192,7 +201,9 @@ function TopHeader2({
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <div className="flex items-center gap-4 pr-4 bg-white relative">
+    <div
+      className={`flex items-center gap-2 pr-0 bg-white relative ${className}`}
+    >
       {isOwner && (
         <button
           onClick={() => setShowCrud(true)}
