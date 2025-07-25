@@ -266,13 +266,10 @@ function MartBody({ filtered }) {
             wishlist={product.wishlist}
             storeId={product.shopId}
             productId={product._id}
-            shop={{
-              name: product.shopName,
-              _id: product.shopId,
-              profilePIC: product.shopPIC,
-              URL: product.shopURL,
-              verified: product.verified,
-            }}
+            shopName={product.shopName}
+            shopPIC={product.shopPIC}
+            verified={product.verified}
+            shopURL={product.shopURL}
           />
         ))}
       </div>
