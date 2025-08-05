@@ -16,15 +16,22 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
     message: "",
     type: "success",
   });
-  const [showDelete, setShowDelete] = useState(false); // ⬅️ State for delete dialog
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     if (product) {
+      let initialImages = product.images || [""];
+      if (
+        initialImages.length === 0 ||
+        initialImages[initialImages.length - 1].trim() !== ""
+      ) {
+        initialImages = [...initialImages, ""];
+      }
       setTitle(product.title || "");
       setDes(product.des || "");
       setPrice(product.price || "");
       setLeft(product.left || "");
-      setImages(product.images || [""]);
+      setImages(initialImages);
     }
   }, [product]);
 
@@ -49,7 +56,7 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
           des,
           price: parseFloat(price),
           left: parseInt(left) || 0,
-          images,
+          images: images.filter((img) => img.trim() !== ""),
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -80,7 +87,7 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
             <X className="w-5 h-5" />
           </button>
           <h2 className="text-xl font-bold mb-4">Edit Product</h2>
-          // Update this inside your component
+
           <form onSubmit={handleUpdate} className="flex flex-col gap-3">
             <input
               type="text"
