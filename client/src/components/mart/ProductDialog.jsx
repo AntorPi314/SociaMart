@@ -54,7 +54,7 @@ const ProductDialog = ({
           <img
             src={currentImage}
             alt={`Product Image ${currentIndex + 1}`}
-            className="w-full h-56 object-cover rounded-md"
+            className="w-full h-72 object-contain rounded-md bg-gray-100"
           />
 
           {/* Left & Right Arrows */}
