@@ -11,7 +11,11 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
   const [price, setPrice] = useState("");
   const [left, setLeft] = useState("");
   const [images, setImages] = useState([""]);
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  });
   const [showDelete, setShowDelete] = useState(false); // ⬅️ State for delete dialog
 
   useEffect(() => {
@@ -28,7 +32,10 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
 
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
+    setTimeout(
+      () => setToast({ show: false, message: "", type: "success" }),
+      3000
+    );
   };
 
   const handleUpdate = async (e) => {
@@ -37,7 +44,13 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
     try {
       const res = await axios.put(
         `http://localhost:3000/editProduct/${storeId}/${product._id}`,
-        { title, des, price: parseFloat(price), left: parseInt(left) || 0, images },
+        {
+          title,
+          des,
+          price: parseFloat(price),
+          left: parseInt(left) || 0,
+          images,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {
@@ -52,20 +65,83 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-        <div className="bg-white p-6 rounded-xl w-full max-w-md relative" onClick={(e) => e.stopPropagation()}>
-          <button onClick={onClose} className="absolute -top-4 -right-4 bg-white p-2 rounded-full shadow">
+      <div
+        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        onClick={onClose}
+      >
+        <div
+          className="bg-white p-6 rounded-xl w-full max-w-md relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute -top-4 -right-4 bg-white p-2 rounded-full shadow"
+          >
             <X className="w-5 h-5" />
           </button>
           <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+          // Update this inside your component
           <form onSubmit={handleUpdate} className="flex flex-col gap-3">
-            <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="border p-2 rounded" />
-            <textarea placeholder="Description" value={des} onChange={(e) => setDes(e.target.value)} className="border p-2 rounded" />
-            <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} className="border p-2 rounded" />
-            <input type="number" placeholder="Stock Left" value={left} onChange={(e) => setLeft(e.target.value)} className="border p-2 rounded" />
-            <input type="text" placeholder="Image URL" value={images[0]} onChange={(e) => setImages([e.target.value])} className="border p-2 rounded" />
+            <input
+              type="text"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <textarea
+              placeholder="Description"
+              value={des}
+              onChange={(e) => setDes(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="border p-2 rounded"
+            />
+            <input
+              type="number"
+              placeholder="Stock Left"
+              value={left}
+              onChange={(e) => setLeft(e.target.value)}
+              className="border p-2 rounded"
+            />
+
+            {/* Dynamic Image URL fields */}
+            {images.map((img, index) => (
+              <input
+                key={index}
+                type="text"
+                placeholder={`Image URL ${index + 1}`}
+                value={img}
+                onChange={(e) => {
+                  const newImages = [...images];
+                  newImages[index] = e.target.value;
+                  setImages(newImages);
+
+                  // Auto-add next field if current is last and not empty, and max 6 images
+                  if (
+                    index === images.length - 1 &&
+                    e.target.value.trim() !== "" &&
+                    images.length < 6
+                  ) {
+                    setImages([...newImages, ""]);
+                  }
+                }}
+                className="border p-2 rounded"
+              />
+            ))}
+
             <div className="flex justify-between mt-4">
-              <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Update</button>
+              <button
+                type="submit"
+                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Update
+              </button>
               <button
                 type="button"
                 className="flex items-center gap-1 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
