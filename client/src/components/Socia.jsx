@@ -28,7 +28,7 @@ export default function Socia({ storeName }) {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const res = await axios.get(
-          `http://localhost:3000/posts/${storeName}`,
+          `https://sociamart.onrender.com/posts/${storeName}`,
           { headers }
         );
 
@@ -151,7 +151,7 @@ function TopHeader({ isLoggedIn, onClickPost }) {
 
     async function fetchProfilePic() {
       try {
-        const res = await axios.get("http://localhost:3000/profile/pic", {
+        const res = await axios.get("https://sociamart.onrender.com/profile/pic", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

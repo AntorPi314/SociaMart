@@ -20,7 +20,7 @@ export default function MyOrderDialog({ open, onClose }) {
       const token = localStorage.getItem("token");
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:3000/my-orders", {
+        const res = await axios.get("https://sociamart.onrender.com/my-orders", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -44,7 +44,7 @@ export default function MyOrderDialog({ open, onClose }) {
         const shopResponses = await Promise.all(
           shopIds.map((id) =>
             axios
-              .get(`http://localhost:3000/stores/info/${id}`)
+              .get(`https://sociamart.onrender.com/stores/info/${id}`)
               .then((res) => res.data)
               .catch(() => null)
           )
@@ -86,7 +86,7 @@ export default function MyOrderDialog({ open, onClose }) {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/rate-product",
+        "https://sociamart.onrender.com/rate-product",
         {
           product_id,
           order_id,

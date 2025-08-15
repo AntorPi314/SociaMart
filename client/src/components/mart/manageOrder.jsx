@@ -24,7 +24,7 @@ export default function ManageOrder({ open, onClose, shopId }) {
       const token = localStorage.getItem("token");
       try {
         const res = await axios.get(
-          `http://localhost:3000/manage-orders/${shopId}`,
+          `https://sociamart.onrender.com/manage-orders/${shopId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -69,7 +69,7 @@ export default function ManageOrder({ open, onClose, shopId }) {
         const token = localStorage.getItem("token");
         try {
           const res = await axios.get(
-            `http://localhost:3000/manage-orders/${shopId}/search-order/${trimmed}`,
+            `https://sociamart.onrender.com/manage-orders/${shopId}/search-order/${trimmed}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
@@ -106,7 +106,7 @@ export default function ManageOrder({ open, onClose, shopId }) {
 
     try {
       const res = await axios.patch(
-        `http://localhost:3000/update-order-status/${shopId}/${editingOrder._id}`,
+        `https://sociamart.onrender.com/update-order-status/${shopId}/${editingOrder._id}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

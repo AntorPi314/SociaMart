@@ -48,8 +48,8 @@ export default function CrudProductDialog({ open, onClose, storeId, product }) {
       };
 
       const endpoint = product
-        ? `http://localhost:3000/product/editProduct/${storeId}/${product._id}`
-        : `http://localhost:3000/product/createProduct/${storeId}`;
+        ? `https://sociamart.onrender.com/product/editProduct/${storeId}/${product._id}`
+        : `https://sociamart.onrender.com/product/createProduct/${storeId}`;
 
       const method = product ? axios.put : axios.post;
 
@@ -73,7 +73,7 @@ export default function CrudProductDialog({ open, onClose, storeId, product }) {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.delete(
-        `http://localhost:3000/product/deleteProduct/${storeId}/${product._id}`,
+        `https://sociamart.onrender.com/product/deleteProduct/${storeId}/${product._id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {

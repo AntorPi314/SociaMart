@@ -50,7 +50,7 @@ export default function EditProductDialog({ open, onClose, storeId, product }) {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.put(
-        `http://localhost:3000/editProduct/${storeId}/${product._id}`,
+        `https://sociamart.onrender.com/editProduct/${storeId}/${product._id}`,
         {
           title,
           des,

@@ -32,7 +32,7 @@ export default function CreatePost({ open, onClose, storeName }) {
       setLoading(true);
 
       const res = await axios.post(
-        `http://localhost:3000/post/${storeName}`,
+        `https://sociamart.onrender.com/post/${storeName}`,
         { text, post_image_link: postImage.trim() || undefined },
         { headers: { Authorization: `Bearer ${token}` } }
       );

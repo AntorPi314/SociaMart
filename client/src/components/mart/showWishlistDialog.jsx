@@ -25,7 +25,7 @@ export default function ShowWishlistDialog({ open, onClose }) {
       const token = localStorage.getItem("token");
 
       try {
-        const res = await axios.get("http://localhost:3000/wishlist", {
+        const res = await axios.get("https://sociamart.onrender.com/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

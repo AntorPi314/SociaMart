@@ -41,7 +41,7 @@ export default function ShowCartDialog({ open, onClose }) {
     setLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("http://localhost:3000/cart", {
+      const res = await axios.get("https://sociamart.onrender.com/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -98,7 +98,7 @@ export default function ShowCartDialog({ open, onClose }) {
     const token = localStorage.getItem("token");
     try {
       await axios.delete(
-        `http://localhost:3000/cart/remove/${storeId}/${productId}`,
+        `https://sociamart.onrender.com/cart/remove/${storeId}/${productId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       showToast("Removed from cart");
@@ -131,7 +131,7 @@ export default function ShowCartDialog({ open, onClose }) {
     setSubmitting(true);
     try {
       const res = await axios.post(
-        "http://localhost:3000/order",
+        "https://sociamart.onrender.com/order",
         { orders },
         { headers: { Authorization: `Bearer ${token}` } }
       );

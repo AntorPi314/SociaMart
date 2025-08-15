@@ -28,7 +28,7 @@ export default function CreateProductDialog({ open, onClose, storeId }) {
     }
     try {
       const res = await axios.post(
-        `http://localhost:3000/createProduct/${storeId}`,
+        `https://sociamart.onrender.com/createProduct/${storeId}`,
         { title, des, price: parseFloat(price), left: parseInt(left) || 0, images },
         { headers: { Authorization: `Bearer ${token}` } }
       );

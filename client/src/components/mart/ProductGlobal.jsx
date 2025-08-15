@@ -50,8 +50,8 @@ const ProductGlobal = ({
     if (!token) return showToast("Please login to use wishlist", "error");
 
     const endpoint = isLiked
-      ? `http://localhost:3000/wishlist/remove/${storeId}/${productId}`
-      : `http://localhost:3000/wishlist/add`;
+      ? `https://sociamart.onrender.com/wishlist/remove/${storeId}/${productId}`
+      : `https://sociamart.onrender.com/wishlist/add`;
 
     const payload = { productId, storeId };
 
@@ -97,7 +97,7 @@ const ProductGlobal = ({
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/cart/add",
+        "https://sociamart.onrender.com/cart/add",
         { productId, storeId },
         {
           headers: {

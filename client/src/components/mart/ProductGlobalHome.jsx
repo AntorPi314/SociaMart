@@ -55,7 +55,7 @@ const ProductGlobal = ({
     try {
       if (isLiked) {
         const res = await axios.delete(
-          `http://localhost:3000/home/wishlist/remove/${storeId}/${productId}`,
+          `https://sociamart.onrender.com/home/wishlist/remove/${storeId}/${productId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -68,7 +68,7 @@ const ProductGlobal = ({
         }
       } else {
         const res = await axios.post(
-          `http://localhost:3000/home/wishlist/add`,
+          `https://sociamart.onrender.com/home/wishlist/add`,
           { storeId, productId },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -94,7 +94,7 @@ const ProductGlobal = ({
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/home/cart/add",
+        "https://sociamart.onrender.com/home/cart/add",
         { productId, storeId },
         {
           headers: {

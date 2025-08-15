@@ -23,7 +23,7 @@ export default function Mart() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/home/products", {
+      const res = await axios.get("https://sociamart.onrender.com/home/products", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
@@ -54,7 +54,7 @@ export default function Mart() {
     if (!searchTerm.trim()) return;
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/home/search", {
+      const res = await axios.get("https://sociamart.onrender.com/home/search", {
         params: { q: searchTerm },
       });
 
